@@ -5,3 +5,10 @@ export async function notifyReviewRequested(input: { eventTitle: string; request
   if (!response.ok) throw new Error(`Discord webhook failed: ${response.status}`)
   return { delivered: true }
 }
+export async function notifyReturnedToDraft(input: { eventTitle: string; reviewer: string; editUrl: string }) {
+  const url = process.env.DISCORD_REVIEW_WEBHOOK_URL
+  if (!url) return { delivered: false, reason: 'DISCORD_REVIEW_WEBHOOK_URL is not configured' }
+  const response = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ content: `差し戻し: **${input.eventTitle}**\n確認者: ${input.reviewer}\n編集: ${input.editUrl}` }) })
+  if (!response.ok) throw new Error(`Discord webhook failed: ${response.status}`)
+  return { delivered: true }
+}

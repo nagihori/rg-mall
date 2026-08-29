@@ -141,9 +141,11 @@ export interface User {
 export interface Event {
   id: number;
   title: string;
-  slug: string;
+  /**
+   * 一覧やSNSシェアに表示される紹介文（160文字以内）
+   */
   summary: string;
-  body: {
+  body?: {
     root: {
       type: string;
       children: {
@@ -157,19 +159,21 @@ export interface Event {
       version: number;
     };
     [k: string]: unknown;
-  };
+  } | null;
   heroImage?: (number | null) | Media;
   galleryImages?: (number | Media)[] | null;
   startsAt?: string | null;
   endsAt?: string | null;
-  status: 'draft' | 'in_review' | 'published' | 'archived';
   publishedAt?: string | null;
+  slug: string;
+  status: 'draft' | 'in_review' | 'published' | 'archived';
   /**
    * 公開済みイベントから作成した作業下書きの元記事
    */
   sourceEvent?: (number | null) | Event;
   updatedAt: string;
   createdAt: string;
+  deletedAt?: string | null;
   _status?: ('draft' | 'published') | null;
 }
 /**
@@ -330,18 +334,19 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface EventsSelect<T extends boolean = true> {
   title?: T;
-  slug?: T;
   summary?: T;
   body?: T;
   heroImage?: T;
   galleryImages?: T;
   startsAt?: T;
   endsAt?: T;
-  status?: T;
   publishedAt?: T;
+  slug?: T;
+  status?: T;
   sourceEvent?: T;
   updatedAt?: T;
   createdAt?: T;
+  deletedAt?: T;
   _status?: T;
 }
 /**

@@ -42,3 +42,61 @@ body,
 .react-select.rs--is-disabled .rs__indicators {
   display: none !important;
 }
+
+/* イベント編集画面ではPayload標準の「ドラフトを保存/変更内容を公開」を使わず、操作は
+   すべて.event-status-actions__barに一本化しているため、標準ボタンは非表示にする。
+   (他のコレクションのid="action-save"には影響しないよう、イベント編集画面だけに絞る) */
+.collection-edit--events #action-save-draft,
+.collection-edit--events #action-save {
+  display: none !important;
+}
+
+/* イベントのワークフロー案内パネル。操作はここではなく画面右下の固定ボタン(.event-status-actions__bar)で行う。
+   ここはあくまで「全体の流れ」と「今どこにいるか」を示すアナウンス表示。 */
+.event-status-actions__panel {
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 4px;
+  padding: calc(var(--base) / 2) var(--base) var(--base);
+}
+
+.event-status-actions__pipeline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--base) / 4);
+  font-size: 0.85rem;
+}
+
+.event-status-actions__pipeline-step {
+  color: var(--theme-elevation-400);
+}
+
+.event-status-actions__pipeline-step--current {
+  color: var(--theme-text);
+  font-weight: 600;
+}
+
+.event-status-actions__preview-link {
+  display: inline-block;
+  margin-top: calc(var(--base) / 2);
+  font-size: 0.85rem;
+}
+
+/* 実際の操作ボタンは画面幅に関わらず右下に固定し、本文をどれだけスクロールしても
+   常に手が届く位置に置く。 */
+.event-status-actions__bar {
+  position: fixed;
+  right: calc(var(--base) * 1.5);
+  bottom: calc(var(--base) * 1.5);
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: calc(var(--base) / 2);
+  max-width: min(92vw, 480px);
+}
+
+/* 固定ボタンの下に本文が隠れないよう、最後まで読み進められる余白を確保する(このバーがある画面のみ) */
+.template-default:has(.event-status-actions__bar) {
+  padding-bottom: calc(var(--base) * 4);
+}
