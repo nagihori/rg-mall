@@ -3,6 +3,7 @@ import * as migration_20260829_123513_add_pending_user_role from './20260829_123
 import * as migration_20260829_132633_media_upload from './20260829_132633_media_upload';
 import * as migration_20260829_135500_media_rights_uploader from './20260829_135500_media_rights_uploader';
 import * as migration_20260829_141200_media_drop_storage_key from './20260829_141200_media_drop_storage_key';
+import * as migration_20260830_000000_media_sizes from './20260830_000000_media_sizes';
 
 export const migrations = [
   {
@@ -29,5 +30,10 @@ export const migrations = [
     up: migration_20260829_141200_media_drop_storage_key.up,
     down: migration_20260829_141200_media_drop_storage_key.down,
     name: '20260829_141200_media_drop_storage_key'
+  },
+  {
+    up: migration_20260830_000000_media_sizes.up,
+    down: migration_20260830_000000_media_sizes.down,
+    name: '20260830_000000_media_sizes'
   },
 ];

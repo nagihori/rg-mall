@@ -7,7 +7,15 @@ export const Media: CollectionConfig = {
     defaultColumns: ['filename', 'alt', 'uploadedBy', 'updatedAt'],
     components: { beforeList: ['./src/cms/components/MediaListDefaultFilter.tsx'] },
   },
-  upload: { mimeTypes: ['image/jpeg', 'image/png', 'image/webp'] },
+  upload: {
+    mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+    // 原本は長辺2400pxまでに縮小してBlobに保存(10MB制限を意識せず使えるように)
+    resizeOptions: { width: 2400, height: 2400, fit: 'inside', withoutEnlargement: true },
+    imageSizes: [
+      { name: 'thumbnail', width: 480, height: 320, fit: 'cover' },
+      { name: 'card', width: 960, fit: 'inside', withoutEnlargement: true },
+    ],
+  },
   hooks: {
     beforeChange: [({ data, operation, req }) => {
       if (operation === 'create' && !data?.uploadedBy) data.uploadedBy = req.user?.id

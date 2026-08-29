@@ -4,6 +4,7 @@ import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { buildConfig } from 'payload'
 import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import sharp from 'sharp'
 import { en } from '@payloadcms/translations/languages/en'
 import { ja } from '@payloadcms/translations/languages/ja'
 import { Events } from './src/cms/collections/events'
@@ -33,6 +34,7 @@ export default buildConfig({
     supportedLanguages: { ja, en },
   },
   editor: lexicalEditor(),
+  sharp,
   collections: [Users, Events, Media, AuditLogs],
   plugins: [
     vercelBlobStorage({
