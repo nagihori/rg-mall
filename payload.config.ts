@@ -1,5 +1,6 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { buildConfig } from 'payload'
 import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -33,6 +34,15 @@ export default buildConfig({
   },
   editor: lexicalEditor(),
   collections: [Users, Events, Media, AuditLogs],
+  plugins: [
+    vercelBlobStorage({
+      collections: { media: true },
+      addRandomSuffix: true,
+      // Vercel上ではデフォルト挙動(BLOB_READ_WRITE_TOKEN / OIDC接続)のまま。
+      // ローカルはVercelと分離したBLOB_LOCAL_READ_WRITE_TOKENを明示指定する。
+      token: process.env.VERCEL ? undefined : process.env.BLOB_LOCAL_READ_WRITE_TOKEN,
+    }),
+  ],
   db: postgresAdapter({
     pool: { connectionString: databaseURL },
     migrationDir: './src/migrations',

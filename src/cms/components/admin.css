@@ -11,3 +11,34 @@ body,
     Roboto,
     sans-serif !important;
 }
+
+/* メディアのサムネイル(一覧の小アイコン・編集画面のプレビュー)を
+   クロップせず全体表示する。デフォルトはobject-fit:coverで、
+   縦長/正方形画像が一覧の正方形アイコン枠に収まらず切れて見えるため。 */
+.thumbnail:not(.thumbnail--size-none) img,
+.thumbnail:not(.thumbnail--size-none) svg {
+  object-fit: contain !important;
+  background: var(--theme-elevation-100);
+}
+
+/* 入力不可フィールドを「表示のみ」と分かるフラットな見た目にする */
+.field-type.text:not(.has-many) input:disabled,
+.field-type.textarea.read-only .textarea-outer,
+.field-type.textarea textarea:disabled {
+  border-color: transparent !important;
+  background: transparent !important;
+  padding-left: 0;
+  box-shadow: none !important;
+}
+
+/* 入力不可の関連フィールド(アップロード者など)もプルダウン風にせず
+   フラットな表示にする。値を確認するリンクは残す。 */
+.react-select.rs--is-disabled .rs__control {
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding-left: 0;
+}
+.react-select.rs--is-disabled .rs__indicators {
+  display: none !important;
+}

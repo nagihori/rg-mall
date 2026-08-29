@@ -178,16 +178,26 @@ export interface Event {
  */
 export interface Media {
   id: number;
-  storageKey: string;
-  url: string;
+  /**
+   * 画像が表示できない場合や読み上げ時に代わりに使われる説明文です。何が写っているかを簡潔に(例:「祭りの会場の様子」)
+   */
   alt: string;
-  credit?: string | null;
-  rightsNote: string;
-  width: number;
-  height: number;
-  mimeType: 'image/jpeg' | 'image/png' | 'image/webp';
+  /**
+   * (C)Square EnixやAI生成など (SSは基本的にスクエニに帰属)
+   */
+  rightsNote?: string | null;
+  uploadedBy?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -321,16 +331,20 @@ export interface EventsSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
-  storageKey?: T;
-  url?: T;
   alt?: T;
-  credit?: T;
   rightsNote?: T;
-  width?: T;
-  height?: T;
-  mimeType?: T;
+  uploadedBy?: T;
   updatedAt?: T;
   createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
