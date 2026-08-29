@@ -5,6 +5,7 @@
 1. 更新担当者が、ブラウザだけで安全に告知を更新できること。
 2. 公開済みのプレイヤー向け画面に、下書きや不完全な情報を出さないこと。
 3. デザインとコンテンツを分離し、コンテンツの更新でレイアウトが壊れないこと。
+4. 月額課金なしで運用できる無料枠を前提にし、上限超過で自動課金させないこと。
 
 ## 守るべき設計
 
@@ -13,7 +14,7 @@
 - DB の値を画面へ直接渡さず、公開用の view model に変換する。
 - 表示上の「開催中」「開催予定」「終了」は、本文の表現ではなく開始・終了日時と公開状態から判定する。
 - 全日時は UTC で保存し、表示は設定済みタイムゾーンで行う。初期設定は `Asia/Tokyo`。
-- 写真はメディア ID を参照し、任意の外部画像 URL を本文へ直接埋め込ませない。
+- 写真は Vercel Blob のメディア ID を参照し、任意の外部画像 URL を本文へ直接埋め込ませない。
 
 ## フロントエンド方針
 
@@ -37,3 +38,12 @@
 - 写真の代替テキストや権利情報なしに公開できる設計にすること。
 - 公開済みデータを物理削除して履歴を失うこと。原則はアーカイブまたは論理削除とする。
 
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

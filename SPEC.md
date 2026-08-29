@@ -44,6 +44,8 @@ type Media = {
 }
 
 type UserRole = 'editor' | 'reviewer' | 'admin'
+
+type AuthProvider = 'discord'
 ```
 
 `RichTextDocument` は CMS が許可した見出し、段落、箇条書き、リンク、画像だけで構成する。生 HTML、script、iframe は許可しない。
@@ -57,6 +59,8 @@ type UserRole = 'editor' | 'reviewer' | 'admin'
 | admin | 全コンテンツ・ユーザー・CMS 設定の管理 |
 
 状態遷移は `draft → in_review → published → archived` を基本とする。reviewer と admin は `in_review → draft` の差し戻しを行える。公開後の編集は新しい下書きとして保存し、再公開まで公開中の内容を維持する。
+
+認証は Discord OAuth の `identify` スコープを使う。Discord ID と CMS のユーザー・role の対応は DB 側で管理し、Discord 上の表示名や UI の表示だけで権限を判定しない。確認依頼時には Discord の専用 Webhook へ、対象・依頼者・プレビュー URL・CMS の確認画面 URL を通知する。Discord のメッセージは承認記録の正本にせず、公開・差し戻しは認証済み CMS で実行して監査ログへ記録する。
 
 ## 入力仕様と正規化
 
@@ -108,4 +112,4 @@ type UserRole = 'editor' | 'reviewer' | 'admin'
 - DB の日次バックアップと、メディアの世代管理を行うこと。
 - 公開・非公開・削除・権限変更の監査ログを最低1年保存すること。
 - 本番・検証環境を分け、本番データを検証環境で編集しないこと。
-
+- 月額課金ゼロを運用制約とする。各サービスは無料枠に固定し、超過時に自動課金されない設定を確認する。利用量と停止・縮退の判断基準を管理画面外の運用手順として毎月確認する。

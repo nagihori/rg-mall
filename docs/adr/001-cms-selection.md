@@ -10,7 +10,7 @@
 
 ## 決定
 
-初期案として、Next.js と Payload CMS を同一 TypeScript プロジェクトで運用する。コンテンツは PostgreSQL、写真は S3 互換ストレージへ保存する。
+初期案として、Next.js と Payload CMS を同一 TypeScript プロジェクトで運用する。コンテンツは Supabase PostgreSQL の無料枠、写真は Vercel Blob へ保存する。管理者・更新担当者の認証は Discord OAuth、確認依頼の通知は Discord Incoming Webhook を使う。
 
 ## 根拠
 
@@ -27,6 +27,9 @@
 ## 影響
 
 - サーバー運用、DB、ストレージ、バックアップが必要になる。
+- Vercel Blob は S3 互換 API ではないため、ストレージ実装は `@vercel/blob` に依存する。将来の移行に備えて、アプリ側はメディア操作を adapter に隔離する。
+- Supabase は PostgreSQL と接続プーリングを提供するため、Payload の標準 PostgreSQL adapter をそのまま使える。Vercel 実行時は transaction pooler を使い、migration とバックアップには direct connection を分離して使う。
+- Supabase Free は低アクティビティ時にプロジェクトを休止し得るため、再開手順とバックアップ復元手順を運用に含める。
+- Vercel Hobby は個人・非商用利用に限られる。無料運用はこの条件と各無料枠内での運用を満たす場合だけ採用する。
 - 実装開始時に Payload の現行サポート状況、ホスティングとの互換性、既存 ID 基盤との連携可否を確認する。
 - 運用開始前に、実際の更新担当者で 5 件程度の告知作成テストを行い、管理画面の補助文言を調整する。
-
