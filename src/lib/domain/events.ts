@@ -3,7 +3,7 @@ export type EventStatus = (typeof eventStatuses)[number]
 export type EventCategory = 'ongoing' | 'upcoming' | 'new' | 'archive'
 
 const transitions: Record<EventStatus, readonly EventStatus[]> = {
-  draft: ['in_review'], in_review: ['draft', 'published'], published: ['draft', 'archived'], archived: [],
+  draft: ['in_review'], in_review: ['draft', 'published'], published: ['draft', 'archived'], archived: ['published'],
 }
 export function canTransition(from: EventStatus, to: EventStatus, role: 'editor' | 'reviewer' | 'admin') {
   if (!transitions[from].includes(to)) return false

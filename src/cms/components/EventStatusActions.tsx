@@ -1,15 +1,16 @@
 'use client'
 
 import type { SelectFieldClientProps } from 'payload'
-import { Button, useAuth, useDocumentInfo, useField, useForm } from '@payloadcms/ui'
+import { Button, ConfirmationModal, useAuth, useDocumentInfo, useField, useForm, useModal } from '@payloadcms/ui'
 import type { EventStatus } from '@/lib/domain/events'
 
 type Role = 'admin' | 'editor' | 'reviewer'
 
-const statusLabels: Record<EventStatus, string> = { draft: '下書き', in_review: '確認待ち', published: '公開中', archived: 'アーカイブ' }
+const statusLabels: Record<EventStatus, string> = { draft: '下書き', in_review: '確認待ち', published: 'トップページに表示中', archived: '過去のイベント' }
 const pipeline: EventStatus[] = ['draft', 'in_review', 'published', 'archived']
+const editConfirmModalSlug = 'event-status-edit-confirm'
 
-type Action = { key: string; to: EventStatus; label: string; description: string; requiresReview?: boolean; style?: 'primary' | 'secondary' }
+type Action = { key: string; to: EventStatus; label: string; description: string; requiresReview?: boolean; requiresConfirm?: boolean; style?: 'primary' | 'secondary' }
 
 // ステータスを変えずに今の内容だけ保存する操作。公開中のときだけ、保存すると確認待ちに戻る
 // （このプロジェクトの設計上、公開中の内容を直接書き換えることはできないため）ので、その旨を明記する。
@@ -30,16 +31,25 @@ function actionsFor(status: EventStatus, role: Role): Action[] {
         canReview
           ? { key: 'draft', to: 'draft', label: '差し戻す', description: '下書きに戻し、編集者に通知します' }
           : { key: 'draft', to: 'draft', label: '取り下げる', description: '確認依頼を取り下げて下書きに戻します' },
-        { key: 'published', to: 'published', label: '公開する', description: 'この内容で公開します', requiresReview: true },
+        { key: 'published', to: 'published', label: 'トップページに表示する', description: 'この内容でトップページに表示します', requiresReview: true },
       ]
     case 'published':
       return [
-        { key: 'draft', to: 'draft', label: '非公開にする', description: '下書きに戻します（サイトからは見えなくなります）' },
-        { key: 'archived', to: 'archived', label: 'アーカイブ', description: '終了したイベントとして扱います（サイトには引き続き表示されます）' },
+        // 表示中の内容は直接編集できない設計のため、「編集する」＝一旦下書きに戻す、という意味を持つ。
+        // 押した瞬間サイトから見えなくなる（押し間違えると即非表示）ので、これだけ確認を挟む。
+        { key: 'draft', to: 'draft', label: '編集する', description: '下書きに戻して編集できるようにします（サイトからは見えなくなります）', requiresConfirm: true },
+        { key: 'archived', to: 'archived', label: '過去のイベントに移動する', description: '終了したイベントとして扱います（サイトには引き続き表示されます）', style: 'secondary' },
       ]
     case 'archived':
-      return []
+      // 内容は変わらないまま表示場所を戻すだけなので、公開と同じ「確認者/管理者のみ」の扱いにする。
+      return [{ key: 'published', to: 'published', label: 'トップページに表示する', description: '過去のイベントからトップページ表示に戻します', requiresReview: true }]
   }
+}
+
+// 確認待ちの間、編集者と確認者/管理者とで「今何を待っているか」が違うため、状況説明の文言を分ける。
+function statusMessage(status: EventStatus, canReview: boolean): string | null {
+  if (status !== 'in_review') return null
+  return canReview ? '承認依頼が届いています。対応を決めてください' : '現在確認中です。承認が降りると公開されて通知が届きます'
 }
 
 // イベント編集画面のワークフロー操作。プルダウンだと本来許されない遷移(下書き→公開など)も選べてしまい
@@ -51,6 +61,7 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
   const { value: slug } = useField<string>({ path: 'slug' })
   const { submit } = useForm()
   const { id, collectionSlug } = useDocumentInfo()
+  const { toggleModal } = useModal()
   const { user } = useAuth()
   const role = ((user as { role?: Role } | null)?.role ?? 'editor') as Role
   const currentStatus = (value ?? 'draft') as EventStatus
@@ -58,6 +69,7 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
   const actions = [saveAction(currentStatus), ...transitions]
   const isPublicNow = currentStatus === 'published' || currentStatus === 'archived'
   const previewUrl = isPublicNow && slug ? `${process.env.NEXT_PUBLIC_APP_URL ?? ''}/events/${slug}` : null
+  const message = statusMessage(currentStatus, role === 'reviewer' || role === 'admin')
 
   const handleClick = async (to: EventStatus) => {
     const previous = currentStatus
@@ -76,6 +88,14 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
 
   return (
     <>
+      <ConfirmationModal
+        modalSlug={editConfirmModalSlug}
+        heading="編集しますか？"
+        body="下書きに戻します。この瞬間からサイトには表示されなくなります。よろしいですか？"
+        confirmLabel="編集する"
+        cancelLabel="キャンセル"
+        onConfirm={() => handleClick('draft')}
+      />
       <div className="event-status-actions__panel">
         <div style={{ marginBottom: '0.5rem', fontWeight: 600 }}>公開ワークフロー</div>
         <div className="event-status-actions__pipeline">
@@ -88,6 +108,7 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
             </span>
           ))}
         </div>
+        {message && <div className="event-status-actions__message">{message}</div>}
         {previewUrl && (
           <a className="event-status-actions__preview-link" href={previewUrl} target="_blank" rel="noreferrer">
             公開ページを開く ↗
@@ -96,7 +117,13 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
       </div>
       <div className="event-status-actions__bar">
         {actions.map((action) => (
-          <Button key={action.key} buttonStyle={action.style ?? 'primary'} size="small" onClick={() => handleClick(action.to)} tooltip={action.description}>
+          <Button
+            key={action.key}
+            buttonStyle={action.style ?? 'primary'}
+            size="small"
+            onClick={() => (action.requiresConfirm ? toggleModal(editConfirmModalSlug) : handleClick(action.to))}
+            tooltip={action.description}
+          >
             {action.label}
           </Button>
         ))}

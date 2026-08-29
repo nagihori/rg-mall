@@ -7,7 +7,7 @@ import { canTransition, type EventStatus } from '@/lib/domain/events'
 import { recordEventTransition } from '../audit'
 import { notifyReturnedToDraft, notifyReviewRequested } from '@/lib/integrations/discord'
 
-const statusLabels: Record<EventStatus, string> = { draft: '下書き', in_review: '確認待ち', published: '公開中', archived: 'アーカイブ' }
+const statusLabels: Record<EventStatus, string> = { draft: '下書き', in_review: '確認待ち', published: 'トップページに表示中', archived: '過去のイベント' }
 
 export const Events: CollectionConfig = {
   slug: 'events', labels: { singular: 'イベント', plural: 'イベント' }, admin: { useAsTitle: 'title', defaultColumns: ['title', 'status', 'updatedAt'] }, versions: { drafts: true, maxPerDoc: 20 }, trash: true,
@@ -61,10 +61,15 @@ export const Events: CollectionConfig = {
     afterDelete: [async ({ doc, req }) => { await recordEventTransition(req, doc.id, 'deleted'); return doc }],
   },
   fields: [
-    { name: 'title', type: 'text', label: 'タイトル', required: true, maxLength: 80 },
-    { name: 'summary', type: 'textarea', label: '概要', required: true, maxLength: 160, admin: { description: '一覧やSNSシェアに表示される紹介文（160文字以内）' } }, { name: 'body', type: 'richText', label: '本文' },
-    { name: 'heroImage', type: 'relationship', label: 'メイン画像', relationTo: 'media' }, { name: 'galleryImages', type: 'relationship', label: 'ギャラリー画像', relationTo: 'media', hasMany: true },
-    { name: 'startsAt', type: 'date', label: '開始日時', admin: { position: 'sidebar', date: { pickerAppearance: 'dayAndTime' } } }, { name: 'endsAt', type: 'date', label: '終了日時', admin: { position: 'sidebar', date: { pickerAppearance: 'dayAndTime' } } },
+    // 公開中は内容を直接編集できない設計。「編集する」ボタンで一旦下書きに戻してから編集する運用のため、
+    // status===published の間は本文系フィールドをすべて表示専用にする（access.updateがfalseを返すとPayloadが自動でreadOnly表示にする）。
+    { name: 'title', type: 'text', label: 'タイトル', required: true, maxLength: 80, access: { update: ({ data }) => data?.status !== 'published' } },
+    { name: 'summary', type: 'textarea', label: '概要', required: true, maxLength: 160, admin: { description: '一覧やSNSシェアに表示される紹介文（160文字以内）' }, access: { update: ({ data }) => data?.status !== 'published' } },
+    { name: 'body', type: 'richText', label: '本文', access: { update: ({ data }) => data?.status !== 'published' } },
+    { name: 'heroImage', type: 'relationship', label: 'メイン画像', relationTo: 'media', access: { update: ({ data }) => data?.status !== 'published' } },
+    { name: 'galleryImages', type: 'relationship', label: 'ギャラリー画像', relationTo: 'media', hasMany: true, access: { update: ({ data }) => data?.status !== 'published' } },
+    { name: 'startsAt', type: 'date', label: '開始日時', admin: { position: 'sidebar', date: { pickerAppearance: 'dayAndTime' } }, access: { update: ({ data }) => data?.status !== 'published' } },
+    { name: 'endsAt', type: 'date', label: '終了日時', admin: { position: 'sidebar', date: { pickerAppearance: 'dayAndTime' } }, access: { update: ({ data }) => data?.status !== 'published' } },
     { name: 'publishedAt', type: 'date', label: '公開日時', admin: { position: 'sidebar', readOnly: true } },
     // URLに使うslugは編集者が普段意識する必要がないため、サイドバーの下の方に控えめに表示するだけにする。
     { name: 'slug', type: 'text', label: 'スラッグ', required: true, unique: true, admin: { position: 'sidebar', readOnly: true } },
@@ -73,7 +78,7 @@ export const Events: CollectionConfig = {
       // versions.drafts が内部的に追加する `_status` フィールドとPostgres enum型名が
       // 衝突する（toSnakeCase('_status') === toSnakeCase('status')）ため、enumNameで分離する。
       enumName: 'enum_events_review_status',
-      options: [{ label: '下書き', value: 'draft' }, { label: '確認待ち', value: 'in_review' }, { label: '公開中', value: 'published' }, { label: 'アーカイブ', value: 'archived' }],
+      options: [{ label: '下書き', value: 'draft' }, { label: '確認待ち', value: 'in_review' }, { label: 'トップページに表示中', value: 'published' }, { label: '過去のイベント', value: 'archived' }],
       // 操作ボタンは画面右下に固定表示するカスタムUIに統一しているため、ここはワークフローの説明表示に徹する。
       // (Payload標準の「ドラフトを保存/変更内容を公開」はsrc/cms/components/admin.cssで非表示にしている)
       admin: { position: 'sidebar', components: { Field: './src/cms/components/EventStatusActions.tsx' } },

@@ -2,6 +2,7 @@ import { classifyEvent, type EventCategory, type EventStatus } from '@/lib/domai
 
 export type PublicEvent = { id: string; title: string; slug: string; summary: string; body: unknown; startsAt?: string | null; endsAt?: string | null; publishedAt?: string | null; status: EventStatus; heroImage?: { url: string; alt: string; thumbnailUrl?: string | null; cardUrl?: string | null } | null }
 export type EventCardViewModel = { title: string; href: string; summary: string; category: EventCategory; period: string; image: { url: string; alt: string } | null }
+export type EventDetailViewModel = EventCardViewModel & { body: unknown; fullImage: { url: string; alt: string } | null }
 const fmt = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', dateStyle: 'medium', timeStyle: 'short' })
 export function presentEventCard(event: PublicEvent, now = new Date()): EventCardViewModel | null {
   const category = classifyEvent(event, now); if (!category) return null
@@ -9,4 +10,9 @@ export function presentEventCard(event: PublicEvent, now = new Date()): EventCar
   // 一覧・カードはBlobに保存済みのcardサイズ(縮小版)を優先して表示を軽くする
   const image = event.heroImage ? { url: event.heroImage.cardUrl ?? event.heroImage.thumbnailUrl ?? event.heroImage.url, alt: event.heroImage.alt } : null
   return { title: event.title, href: `/events/${event.slug}`, summary: event.summary, category, period, image }
+}
+export function presentEventDetail(event: PublicEvent, now = new Date()): EventDetailViewModel | null {
+  const card = presentEventCard(event, now); if (!card) return null
+  const fullImage = event.heroImage ? { url: event.heroImage.url, alt: event.heroImage.alt } : null
+  return { ...card, body: event.body, fullImage }
 }

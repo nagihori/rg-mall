@@ -82,21 +82,42 @@ body,
   font-size: 0.85rem;
 }
 
-/* 実際の操作ボタンは画面幅に関わらず右下に固定し、本文をどれだけスクロールしても
-   常に手が届く位置に置く。 */
+/* 確認待ちの状況説明。役割によって文言が変わるため、案内として少し強調しておく。 */
+.event-status-actions__message {
+  margin-top: calc(var(--base) / 2);
+  padding: calc(var(--base) / 2) var(--base);
+  border-radius: 4px;
+  background: var(--theme-warning-100);
+  color: var(--theme-warning-750);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* 実際の操作ボタンは画面幅に関わらず下部に帯として固定し、本文をどれだけスクロールしても
+   常に手が届く位置に置く。内容を書き終えたら流れるように押せるよう、大きく・目立つ色・中央揃えにする。 */
 .event-status-actions__bar {
   position: fixed;
-  right: calc(var(--base) * 1.5);
-  bottom: calc(var(--base) * 1.5);
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 20;
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: calc(var(--base) / 2);
-  max-width: min(92vw, 480px);
+  justify-content: center;
+  align-items: center;
+  gap: var(--base);
+  padding: var(--base) calc(var(--base) * 1.5);
+  background: var(--theme-elevation-0);
+  border-top: 1px solid var(--theme-elevation-150);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.event-status-actions__bar button {
+  font-size: 1rem !important;
+  padding: calc(var(--base) / 1.5) calc(var(--base) * 1.5) !important;
 }
 
 /* 固定ボタンの下に本文が隠れないよう、最後まで読み進められる余白を確保する(このバーがある画面のみ) */
 .template-default:has(.event-status-actions__bar) {
-  padding-bottom: calc(var(--base) * 4);
+  padding-bottom: calc(var(--base) * 5);
 }
