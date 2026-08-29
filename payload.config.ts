@@ -3,6 +3,8 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { buildConfig } from 'payload'
 import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { en } from '@payloadcms/translations/languages/en'
+import { ja } from '@payloadcms/translations/languages/ja'
 import { Events } from './src/cms/collections/events'
 import { Users } from './src/cms/collections/users'
 import { Media } from './src/cms/collections/media'
@@ -20,7 +22,14 @@ export default buildConfig({
   admin: {
     user: 'users',
     importMap: { baseDir: configDir },
-    components: { beforeLogin: ['./src/cms/components/DiscordLoginButton.tsx'] },
+    components: {
+      beforeLogin: ['./src/cms/components/DiscordLoginButton.tsx'],
+      providers: ['./src/cms/components/AdminFont.tsx'],
+    },
+  },
+  i18n: {
+    fallbackLanguage: 'ja',
+    supportedLanguages: { ja, en },
   },
   editor: lexicalEditor(),
   collections: [Users, Events, Media, AuditLogs],

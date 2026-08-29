@@ -6,7 +6,7 @@ import { assertTransition } from '@/lib/domain/events'
 import { recordEventTransition } from '../audit'
 
 export const Events: CollectionConfig = {
-  slug: 'events', admin: { useAsTitle: 'title', defaultColumns: ['title', 'status', 'updatedAt'] }, versions: { drafts: true, maxPerDoc: 20 },
+  slug: 'events', labels: { singular: 'イベント', plural: 'イベント' }, admin: { useAsTitle: 'title', defaultColumns: ['title', 'status', 'updatedAt'] }, versions: { drafts: true, maxPerDoc: 20 },
   access: { read: canEdit, create: canEdit, update: canEdit, delete: isAdmin },
   hooks: {
     beforeValidate: [async ({ data, operation, req }) => {
@@ -34,17 +34,17 @@ export const Events: CollectionConfig = {
     afterDelete: [async ({ doc, req }) => { await recordEventTransition(req, doc.id, 'deleted'); return doc }],
   },
   fields: [
-    { name: 'title', type: 'text', required: true, maxLength: 80 }, { name: 'slug', type: 'text', required: true, unique: true, admin: { readOnly: true } },
-    { name: 'summary', type: 'textarea', required: true, minLength: 20, maxLength: 160 }, { name: 'body', type: 'richText', required: true },
-    { name: 'heroImage', type: 'relationship', relationTo: 'media' }, { name: 'galleryImages', type: 'relationship', relationTo: 'media', hasMany: true },
-    { name: 'startsAt', type: 'date', admin: { date: { pickerAppearance: 'dayAndTime' } } }, { name: 'endsAt', type: 'date', admin: { date: { pickerAppearance: 'dayAndTime' } } },
+    { name: 'title', type: 'text', label: 'タイトル', required: true, maxLength: 80 }, { name: 'slug', type: 'text', label: 'スラッグ', required: true, unique: true, admin: { readOnly: true } },
+    { name: 'summary', type: 'textarea', label: '概要', required: true, minLength: 20, maxLength: 160 }, { name: 'body', type: 'richText', label: '本文', required: true },
+    { name: 'heroImage', type: 'relationship', label: 'メイン画像', relationTo: 'media' }, { name: 'galleryImages', type: 'relationship', label: 'ギャラリー画像', relationTo: 'media', hasMany: true },
+    { name: 'startsAt', type: 'date', label: '開始日時', admin: { date: { pickerAppearance: 'dayAndTime' } } }, { name: 'endsAt', type: 'date', label: '終了日時', admin: { date: { pickerAppearance: 'dayAndTime' } } },
     {
-      name: 'status', type: 'select', required: true, defaultValue: 'draft',
+      name: 'status', type: 'select', label: 'ステータス', required: true, defaultValue: 'draft',
       // versions.drafts が内部的に追加する `_status` フィールドとPostgres enum型名が
       // 衝突する（toSnakeCase('_status') === toSnakeCase('status')）ため、enumNameで分離する。
       enumName: 'enum_events_review_status',
       options: [{ label: '下書き', value: 'draft' }, { label: '確認待ち', value: 'in_review' }, { label: '公開中', value: 'published' }, { label: 'アーカイブ', value: 'archived' }],
     },
-    { name: 'publishedAt', type: 'date', admin: { readOnly: true } }, { name: 'sourceEvent', type: 'relationship', relationTo: 'events', admin: { readOnly: true, description: '公開済みイベントから作成した作業下書きの元記事' } },
+    { name: 'publishedAt', type: 'date', label: '公開日時', admin: { readOnly: true } }, { name: 'sourceEvent', type: 'relationship', label: '元記事', relationTo: 'events', admin: { readOnly: true, description: '公開済みイベントから作成した作業下書きの元記事' } },
   ],
 }
