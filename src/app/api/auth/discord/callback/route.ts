@@ -6,6 +6,8 @@ import { exchangeDiscordCode, fetchDiscordUser } from '@/lib/integrations/discor
 
 const STATE_COOKIE = 'discord_oauth_state'
 
+export const dynamic = 'force-dynamic'
+
 function loginError(request: NextRequest, reason: string) {
   const url = new URL('/admin/login', request.nextUrl.origin)
   url.searchParams.set('error', reason)

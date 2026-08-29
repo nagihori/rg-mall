@@ -3,6 +3,8 @@ import { buildDiscordAuthorizeUrl } from '@/lib/integrations/discordOAuth'
 
 const STATE_COOKIE = 'discord_oauth_state'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   const state = crypto.randomUUID()
   let authorizeUrl: string
