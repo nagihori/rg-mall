@@ -8,9 +8,14 @@ const STATE_COOKIE = 'discord_oauth_state'
 
 export const dynamic = 'force-dynamic'
 
-function loginError(request: NextRequest, reason: string) {
+function loginError(request: NextRequest, reason: string, debug?: Record<string, string>) {
   const url = new URL('/admin/login', request.nextUrl.origin)
   url.searchParams.set('error', reason)
+  if (debug) {
+    for (const [key, value] of Object.entries(debug)) {
+      url.searchParams.set(`debug_${key}`, value)
+    }
+  }
   const response = NextResponse.redirect(url)
   response.cookies.delete(STATE_COOKIE)
   return response
@@ -23,7 +28,15 @@ export async function GET(request: NextRequest) {
   const expectedState = request.cookies.get(STATE_COOKIE)?.value
 
   if (!code || !state || !expectedState || state !== expectedState) {
-    return loginError(request, 'invalid_state')
+    return loginError(request, 'invalid_state', {
+      hasCode: String(Boolean(code)),
+      state: state ?? '(none)',
+      expectedState: expectedState ?? '(none)',
+      cookieNames: request.cookies.getAll().map((c) => c.name).join(',') || '(none)',
+      hasCookieHeader: String(Boolean(request.headers.get('cookie'))),
+      host: request.nextUrl.host,
+      forwardedHost: request.headers.get('x-forwarded-host') ?? '(none)',
+    })
   }
 
   let discordUser: { id: string; username: string }
