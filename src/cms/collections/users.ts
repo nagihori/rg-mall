@@ -3,7 +3,7 @@ import { JWTAuthentication } from 'payload'
 import { isAdmin } from '../access'
 import { recordRoleChange } from '../audit'
 
-export const Users: CollectionConfig = { slug: 'users', auth: { disableLocalStrategy: true, useSessions: false, strategies: [{ name: 'local-jwt', authenticate: JWTAuthentication }] }, admin: { useAsTitle: 'discordUsername' }, access: { read: isAdmin, create: isAdmin, update: isAdmin, delete: isAdmin }, hooks: { afterChange: [async ({ doc, previousDoc, req }) => { if (previousDoc && doc.role !== previousDoc.role) await recordRoleChange(req, doc.id); return doc }] }, fields: [
+export const Users: CollectionConfig = { slug: 'users', auth: { disableLocalStrategy: true, useSessions: false, strategies: [{ name: 'local-jwt', authenticate: JWTAuthentication }] }, admin: { useAsTitle: 'discordUsername', defaultColumns: ['discordUsername', 'discordId', 'role', 'createdAt'] }, access: { read: isAdmin, create: isAdmin, update: isAdmin, delete: isAdmin }, hooks: { afterChange: [async ({ doc, previousDoc, req, operation }) => { if (operation === 'update' && doc.role !== previousDoc?.role) await recordRoleChange(req, doc.id); return doc }] }, fields: [
   { name: 'discordId', type: 'text', required: true, unique: true }, { name: 'discordUsername', type: 'text', required: true },
-  { name: 'role', type: 'select', required: true, defaultValue: 'editor', options: ['editor', 'reviewer', 'admin'] },
+  { name: 'role', type: 'select', required: true, defaultValue: 'editor', options: ['pending', 'editor', 'reviewer', 'admin'] },
 ] }

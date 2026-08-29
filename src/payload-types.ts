@@ -129,7 +129,7 @@ export interface User {
   id: number;
   discordId: string;
   discordUsername: string;
-  role: 'editor' | 'reviewer' | 'admin';
+  role: 'pending' | 'editor' | 'reviewer' | 'admin';
   updatedAt: string;
   createdAt: string;
   collection: 'users';

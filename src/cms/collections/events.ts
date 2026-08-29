@@ -18,7 +18,8 @@ export const Events: CollectionConfig = {
     beforeChange: [({ data, originalDoc, req }) => {
       const next = data ?? {}; const nextStatus = next.status ?? originalDoc?.status ?? 'draft'
       const previousStatus = originalDoc?.status
-      if (previousStatus && nextStatus !== previousStatus) assertTransition(previousStatus as 'draft' | 'in_review' | 'published' | 'archived', nextStatus as 'draft' | 'in_review' | 'published' | 'archived', req.user?.role ?? 'editor')
+      const editorRole = req.user?.role === 'pending' ? 'editor' : (req.user?.role ?? 'editor')
+      if (previousStatus && nextStatus !== previousStatus) assertTransition(previousStatus as 'draft' | 'in_review' | 'published' | 'archived', nextStatus as 'draft' | 'in_review' | 'published' | 'archived', editorRole)
       if (nextStatus === 'published' && !canReview({ req })) throw new Error('公開は確認者または管理者のみ実行できます')
       if (previousStatus === 'published' && nextStatus === 'published') throw new Error('公開版は直接編集できません。作業用下書きを作成してください。')
       if (nextStatus === 'published') { eventInputSchema.parse(next); next.publishedAt = new Date().toISOString() }

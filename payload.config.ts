@@ -17,7 +17,12 @@ if (!databaseURL) {
 
 export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || 'development-only-change-me',
-  admin: { user: 'users', importMap: { baseDir: configDir } }, editor: lexicalEditor(),
+  admin: {
+    user: 'users',
+    importMap: { baseDir: configDir },
+    components: { beforeLogin: ['./src/cms/components/DiscordLoginButton.tsx'] },
+  },
+  editor: lexicalEditor(),
   collections: [Users, Events, Media, AuditLogs],
   db: postgresAdapter({
     pool: { connectionString: databaseURL },

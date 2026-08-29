@@ -8,14 +8,9 @@ const STATE_COOKIE = 'discord_oauth_state'
 
 export const dynamic = 'force-dynamic'
 
-function loginError(request: NextRequest, reason: string, debug?: Record<string, string>) {
+function loginError(request: NextRequest, reason: string) {
   const url = new URL('/admin/login', request.nextUrl.origin)
   url.searchParams.set('error', reason)
-  if (debug) {
-    for (const [key, value] of Object.entries(debug)) {
-      url.searchParams.set(`debug_${key}`, value)
-    }
-  }
   const response = NextResponse.redirect(url)
   response.cookies.delete(STATE_COOKIE)
   return response
@@ -28,15 +23,7 @@ export async function GET(request: NextRequest) {
   const expectedState = request.cookies.get(STATE_COOKIE)?.value
 
   if (!code || !state || !expectedState || state !== expectedState) {
-    return loginError(request, 'invalid_state', {
-      hasCode: String(Boolean(code)),
-      state: state ?? '(none)',
-      expectedState: expectedState ?? '(none)',
-      cookieNames: request.cookies.getAll().map((c) => c.name).join(',') || '(none)',
-      hasCookieHeader: String(Boolean(request.headers.get('cookie'))),
-      host: request.nextUrl.host,
-      forwardedHost: request.headers.get('x-forwarded-host') ?? '(none)',
-    })
+    return loginError(request, 'invalid_state')
   }
 
   let discordUser: { id: string; username: string }
@@ -56,18 +43,27 @@ export async function GET(request: NextRequest) {
     overrideAccess: true,
   })
 
-  const user = existing.docs[0]
+  let user = existing.docs[0]
   if (!user) {
-    return loginError(request, 'user_not_registered')
-  }
-
-  if (user.discordUsername !== discordUser.username) {
-    await payload.update({
+    user = await payload.create({
+      collection: 'users',
+      data: { discordId: discordUser.id, discordUsername: discordUser.username, role: 'pending' },
+      overrideAccess: true,
+    })
+  } else if (user.discordUsername !== discordUser.username) {
+    user = await payload.update({
       collection: 'users',
       id: user.id,
       data: { discordUsername: discordUser.username },
       overrideAccess: true,
     })
+  }
+
+  if (user.role === 'pending') {
+    const url = new URL('/login/pending', request.nextUrl.origin)
+    const response = NextResponse.redirect(url)
+    response.cookies.delete(STATE_COOKIE)
+    return response
   }
 
   const collectionConfig = payload.collections.users.config
