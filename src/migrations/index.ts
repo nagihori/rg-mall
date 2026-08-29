@@ -4,6 +4,9 @@ import * as migration_20260829_132633_media_upload from './20260829_132633_media
 import * as migration_20260829_135500_media_rights_uploader from './20260829_135500_media_rights_uploader';
 import * as migration_20260829_141200_media_drop_storage_key from './20260829_141200_media_drop_storage_key';
 import * as migration_20260830_000000_media_sizes from './20260830_000000_media_sizes';
+import * as migration_20260830_010000_events_created_by_discord from './20260830_010000_events_created_by_discord';
+import * as migration_20260830_020000_events_created_by_username from './20260830_020000_events_created_by_username';
+import * as migration_20260830_030000_events_location_and_review_requester from './20260830_030000_events_location_and_review_requester';
 
 export const migrations = [
   {
@@ -35,5 +38,20 @@ export const migrations = [
     up: migration_20260830_000000_media_sizes.up,
     down: migration_20260830_000000_media_sizes.down,
     name: '20260830_000000_media_sizes'
+  },
+  {
+    up: migration_20260830_010000_events_created_by_discord.up,
+    down: migration_20260830_010000_events_created_by_discord.down,
+    name: '20260830_010000_events_created_by_discord'
+  },
+  {
+    up: migration_20260830_020000_events_created_by_username.up,
+    down: migration_20260830_020000_events_created_by_username.down,
+    name: '20260830_020000_events_created_by_username'
+  },
+  {
+    up: migration_20260830_030000_events_location_and_review_requester.up,
+    down: migration_20260830_030000_events_location_and_review_requester.down,
+    name: '20260830_030000_events_location_and_review_requester'
   },
 ];

@@ -96,7 +96,7 @@ npm run payload:migrate
 
 `payload:migrate:create` は migration ファイルを作るだけで、`DATABASE_ADMIN_URL` を要求しない。`payload:migrate` は `DATABASE_ADMIN_URL` を使って既存 migration を本番 DB に適用する専用コマンドであり、Vercel build には含めずローカル管理環境からのみ実行する。この script は `DATABASE_ADMIN_URL` が未設定なら失敗し、Vercel 上では実行を拒否する。`DATABASE_ADMIN_URL` を Vercel に設定したり、通常の `dev` / `build` / `start` の `DATABASE_URL` として使ったりしてはならない。
 
-本番環境に必要な値は `DATABASE_URL`、`PAYLOAD_SECRET`、`NEXT_PUBLIC_APP_URL`、`BLOB_READ_WRITE_TOKEN`、`DISCORD_CLIENT_ID`、`DISCORD_CLIENT_SECRET`、`DISCORD_REDIRECT_URI`、`DISCORD_REVIEW_WEBHOOK_URL` である。秘密値は `.env.local` と Vercel Environment Variables のみに置き、Git に追加しない。
+本番環境に必要な値は `DATABASE_URL`、`PAYLOAD_SECRET`、`NEXT_PUBLIC_APP_URL`、`BLOB_READ_WRITE_TOKEN`、`DISCORD_CLIENT_ID`、`DISCORD_CLIENT_SECRET`、`DISCORD_REDIRECT_URI`、`DISCORD_REVIEW_WEBHOOK_URL`である。`DISCORD_REVIEWER_ROLE_ID`（確認依頼通知でのロールメンション用）は省略可。秘密値は `.env.local` と Vercel Environment Variables のみに置き、Git に追加しない。
 
 ## 外部サービスの設定
 

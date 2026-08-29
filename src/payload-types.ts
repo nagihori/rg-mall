@@ -164,13 +164,21 @@ export interface Event {
   galleryImages?: (number | Media)[] | null;
   startsAt?: string | null;
   endsAt?: string | null;
+  /**
+   * 開催場所（自由入力）
+   */
+  location?: string | null;
   publishedAt?: string | null;
-  slug: string;
+  slug?: string | null;
   status: 'draft' | 'in_review' | 'published' | 'archived';
   /**
    * 公開済みイベントから作成した作業下書きの元記事
    */
   sourceEvent?: (number | null) | Event;
+  createdByDiscordId?: string | null;
+  createdByUsername?: string | null;
+  reviewRequestedByDiscordId?: string | null;
+  reviewRequestedByUsername?: string | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -340,10 +348,15 @@ export interface EventsSelect<T extends boolean = true> {
   galleryImages?: T;
   startsAt?: T;
   endsAt?: T;
+  location?: T;
   publishedAt?: T;
   slug?: T;
   status?: T;
   sourceEvent?: T;
+  createdByDiscordId?: T;
+  createdByUsername?: T;
+  reviewRequestedByDiscordId?: T;
+  reviewRequestedByUsername?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;

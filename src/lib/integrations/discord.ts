@@ -1,14 +1,35 @@
-export async function notifyReviewRequested(input: { eventTitle: string; requester: string; reviewUrl: string; previewUrl: string }) {
+async function sendReviewWebhook(content: string) {
   const url = process.env.DISCORD_REVIEW_WEBHOOK_URL
   if (!url) return { delivered: false, reason: 'DISCORD_REVIEW_WEBHOOK_URL is not configured' }
-  const response = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ content: `確認依頼: **${input.eventTitle}**\n依頼者: ${input.requester}\n確認: ${input.reviewUrl}\nプレビュー: ${input.previewUrl}` }) })
+  const response = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ content }) })
   if (!response.ok) throw new Error(`Discord webhook failed: ${response.status}`)
   return { delivered: true }
 }
-export async function notifyReturnedToDraft(input: { eventTitle: string; reviewer: string; editUrl: string }) {
-  const url = process.env.DISCORD_REVIEW_WEBHOOK_URL
-  if (!url) return { delivered: false, reason: 'DISCORD_REVIEW_WEBHOOK_URL is not configured' }
-  const response = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ content: `差し戻し: **${input.eventTitle}**\n確認者: ${input.reviewer}\n編集: ${input.editUrl}` }) })
-  if (!response.ok) throw new Error(`Discord webhook failed: ${response.status}`)
-  return { delivered: true }
+
+export async function notifyReviewRequested(input: { eventTitle: string; requester: string; reviewUrl: string; previewUrl: string }) {
+  const reviewerRoleId = process.env.DISCORD_REVIEWER_ROLE_ID
+  const mention = reviewerRoleId ? `<@&${reviewerRoleId}> ` : ''
+  return sendReviewWebhook(`
+      ### ✅ ${input.requester} から確認依頼が届いています ${mention}
+      > **「[${input.eventTitle}](${input.reviewUrl})」** ([プレビュー](${input.previewUrl}))
+    `)
+}
+
+export async function notifyReturnedToDraft(input: { eventTitle: string; reviewer: string; editUrl: string; authorDiscordId?: string | null }) {
+  const mention = input.authorDiscordId ? `<@${input.authorDiscordId}> ` : ''
+  return sendReviewWebhook(`
+      ### 🔔 確認依頼したイベントが${input.reviewer}に差し戻しされました ${mention}
+      > **「[${input.eventTitle}](${input.editUrl})」** から再編集してください
+    `)
+}
+
+export async function notifyPublished(input: { eventTitle: string; summary: string; requester: string; publicUrl: string }) {
+  return sendReviewWebhook(`
+      @here\n### 🎉 ${input.requester}が書いたイベント 「[**${input.eventTitle}**](${input.publicUrl})」 が公開されました
+      > ${input.summary}
+    `)
+}
+
+export async function notifyArchived(input: { eventTitle: string; actor: string }) {
+  return sendReviewWebhook(`アーカイブ: **${input.eventTitle}**\n実行者: ${input.actor}`)
 }

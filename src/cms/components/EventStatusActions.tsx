@@ -59,6 +59,8 @@ function statusMessage(status: EventStatus, canReview: boolean): string | null {
 export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) => {
   const { value, setValue } = useField<EventStatus>({ path })
   const { value: slug } = useField<string>({ path: 'slug' })
+  const { value: authorName } = useField<string>({ path: 'createdByUsername' })
+  const { value: requesterName } = useField<string>({ path: 'reviewRequestedByUsername' })
   const { submit } = useForm()
   const { id, collectionSlug } = useDocumentInfo()
   const { toggleModal } = useModal()
@@ -109,6 +111,12 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
           ))}
         </div>
         {message && <div className="event-status-actions__message">{message}</div>}
+        {(authorName || requesterName) && (
+          <div className="event-status-actions__people">
+            {authorName && <div>作成者: {authorName}</div>}
+            {requesterName && <div>確認依頼者: {requesterName}</div>}
+          </div>
+        )}
         {previewUrl && (
           <a className="event-status-actions__preview-link" href={previewUrl} target="_blank" rel="noreferrer">
             公開ページを開く ↗

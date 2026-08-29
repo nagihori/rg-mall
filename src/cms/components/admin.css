@@ -93,6 +93,52 @@ body,
   font-weight: 500;
 }
 
+/* 「誰が書いたか／誰が確認依頼したか」の表示。ワークフロー説明の下に控えめに添える。 */
+.event-status-actions__people {
+  margin-top: calc(var(--base) / 2);
+  font-size: 0.85rem;
+  color: var(--theme-elevation-600);
+}
+
+/* イベント一覧上部の絞り込みバー(自分の記事のみ表示トグル・作成者/確認依頼者プルダウン)。 */
+.event-list-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--base);
+  margin-bottom: var(--base);
+}
+
+.event-list-filters__toggle {
+  padding: calc(var(--base) / 4) var(--base);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 4px;
+  background: var(--theme-elevation-50);
+  color: var(--theme-text);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.event-list-filters__toggle:hover {
+  background: var(--theme-elevation-100);
+}
+
+.event-list-filters__select {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--base) / 4);
+  font-size: 0.85rem;
+  color: var(--theme-elevation-600);
+}
+
+.event-list-filters__select select {
+  padding: calc(var(--base) / 4) calc(var(--base) / 2);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 4px;
+  background: var(--theme-input-bg);
+  color: var(--theme-text);
+}
+
 /* 実際の操作ボタンは画面幅に関わらず下部に帯として固定し、本文をどれだけスクロールしても
    常に手が届く位置に置く。内容を書き終えたら流れるように押せるよう、大きく・目立つ色・中央揃えにする。 */
 .event-status-actions__bar {
@@ -120,4 +166,49 @@ body,
 /* 固定ボタンの下に本文が隠れないよう、最後まで読み進められる余白を確保する(このバーがある画面のみ) */
 .template-default:has(.event-status-actions__bar) {
   padding-bottom: calc(var(--base) * 5);
+}
+
+/* 作成・編集画面の「一覧へ戻る」リンク(«のみ表示・ツールチップで説明)。
+   差し込み先はDocumentControlsのボタン列(行の右側)だが、同じ行の左端に固定表示したいため、
+   行全体のラッパー(.doc-controls__wrapper)を基準に絶対配置してタイトル・ステータス側と同じ
+   左端に揃える。プレビュー/保存ボタンと同じ高さ感の正方形セカンダリボタンにする。 */
+.collection-edit--events .doc-controls__wrapper {
+  position: relative;
+}
+
+/* Payload標準で.doc-controls__controls-wrapperにposition:relativeが付いており、
+   このままだと絶対配置の基準がそちらになってしまい行全体ではなく右側のボタン塊内の
+   左端に来てしまう(=見た目は行の右寄りのまま)。基準を一つ外側の.doc-controls__wrapperに
+   escalateさせるため、ここだけ打ち消す。 */
+.collection-edit--events .doc-controls__controls-wrapper {
+  position: static;
+}
+
+/* 一覧へ戻るボタン分、左端のステータス表示と重ならないよう余白を空ける。 */
+.collection-edit--events .doc-controls__content {
+  padding-left: calc(40px + var(--base) / 2);
+}
+
+.back-to-list-link {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 4px;
+  background: var(--theme-elevation-50);
+  color: var(--theme-elevation-800);
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.back-to-list-link:hover {
+  background: var(--theme-elevation-100);
+  color: var(--theme-text);
 }
