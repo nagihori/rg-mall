@@ -9,11 +9,16 @@ export const Media: CollectionConfig = {
   },
   upload: {
     mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
-    // 原本は長辺2400pxまでに縮小してBlobに保存(10MB制限を意識せず使えるように)
-    resizeOptions: { width: 2400, height: 2400, fit: 'inside', withoutEnlargement: true },
+    // 原本は長辺1600pxまでに縮小してBlobに保存(無料枠のストレージ・帯域を圧迫しないように)。
+    // 詳細ページでの「拡大」表示にはこの原本(1600px)をそのまま使う想定。
+    resizeOptions: { width: 1600, height: 1600, fit: 'inside', withoutEnlargement: true },
+    // 全サイズをwebpに変換して圧縮する(JPEG/PNGのままだと特にPNGで無駄にファイルが大きくなるため)。
+    formatOptions: { format: 'webp', options: { quality: 80 } },
     imageSizes: [
-      { name: 'thumbnail', width: 480, height: 320, fit: 'cover' },
-      { name: 'card', width: 960, fit: 'inside', withoutEnlargement: true },
+      { name: 'thumbnail', width: 480, height: 320, fit: 'cover', formatOptions: { format: 'webp', options: { quality: 75 } } },
+      { name: 'card', width: 960, fit: 'inside', withoutEnlargement: true, formatOptions: { format: 'webp', options: { quality: 78 } } },
+      // 公開ページの通常表示(コンテナ幅約1152px)用。原本(1600px)より小さく、拡大表示と差を付ける。
+      { name: 'detail', width: 1280, fit: 'inside', withoutEnlargement: true, formatOptions: { format: 'webp', options: { quality: 80 } } },
     ],
   },
   hooks: {

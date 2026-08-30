@@ -70,7 +70,10 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
   const transitions = actionsFor(currentStatus, role).filter((action) => !action.requiresReview || role === 'reviewer' || role === 'admin')
   const actions = [saveAction(currentStatus), ...transitions]
   const isPublicNow = currentStatus === 'published' || currentStatus === 'archived'
-  const previewUrl = isPublicNow && slug ? `${process.env.NEXT_PUBLIC_APP_URL ?? ''}/events/${slug}` : null
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
+  // 公開中/過去のイベントは公開URLそのもの、下書き・確認待ちはステータスを無視して読めるプレビュー専用ルートを指す。
+  // まだ一度も保存していない(id未確定の)新規作成中はどちらも参照できないため出さない。
+  const previewUrl = !id ? null : isPublicNow && slug ? `${appUrl}/events/${slug}` : `${appUrl}/events/preview/${id}`
   const message = statusMessage(currentStatus, role === 'reviewer' || role === 'admin')
 
   const handleClick = async (to: EventStatus) => {
@@ -119,7 +122,7 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
         )}
         {previewUrl && (
           <a className="event-status-actions__preview-link" href={previewUrl} target="_blank" rel="noreferrer">
-            公開ページを開く ↗
+            {isPublicNow ? '公開ページを開く ↗' : 'プレビューを開く ↗'}
           </a>
         )}
       </div>

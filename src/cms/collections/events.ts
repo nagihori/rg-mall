@@ -64,10 +64,11 @@ export const Events: CollectionConfig = {
       const action = doc.status === 'published' ? 'published' : doc.status === 'archived' ? 'archived' : doc.status === 'draft' && previousDoc?.status === 'in_review' ? 'returned_to_draft' : null
       if (action) await recordEventTransition(req, doc.id, action)
       const editUrl = `${process.env.NEXT_PUBLIC_APP_URL}/admin/collections/events/${doc.id}`
+      const previewUrl = `${process.env.NEXT_PUBLIC_APP_URL}/events/preview/${doc.id}`
       const requester = req.user?.discordUsername ?? '不明なユーザー'
       try {
         if (doc.status === 'in_review' && previousDoc?.status === 'draft') {
-          await notifyReviewRequested({ eventTitle: doc.title, requester, reviewUrl: editUrl, previewUrl: editUrl })
+          await notifyReviewRequested({ eventTitle: doc.title, requester, reviewUrl: editUrl, previewUrl })
         } else if (doc.status === 'draft' && previousDoc?.status === 'in_review' && req.user?.role !== 'editor') {
           // 編集者自身が確認依頼を取り下げた場合は通知不要。確認者/管理者が差し戻した場合のみ編集者へ知らせる。
           await notifyReturnedToDraft({ eventTitle: doc.title, reviewer: requester, editUrl, authorDiscordId: doc.createdByDiscordId })
@@ -103,7 +104,7 @@ export const Events: CollectionConfig = {
     // required: trueにすると新規作成時(まだ生成前でクライアント側は空)に「必須」エラー＆*表示が出てしまう。
     // 実際の必須チェックはこのvalidateだけで行う(更新時は空を許さない・作成時はフックに任せて素通りさせる)。
     {
-      name: 'slug', type: 'text', label: 'スラッグ', unique: true, admin: { position: 'sidebar', readOnly: true },
+      name: 'slug', type: 'text', label: 'スラッグ', unique: true, admin: { position: 'sidebar', readOnly: true, condition: (data) => Boolean(data?.slug) },
       validate: (value: string | null | undefined, { operation }: { operation?: string }) => (operation === 'create' ? true : (Boolean(value) || 'スラッグは必須です')),
     },
     {
@@ -116,13 +117,13 @@ export const Events: CollectionConfig = {
       // (Payload標準の「ドラフトを保存/変更内容を公開」はsrc/cms/components/admin.cssで非表示にしている)
       admin: { position: 'sidebar', components: { Field: './src/cms/components/EventStatusActions.tsx' } },
     },
-    { name: 'sourceEvent', type: 'relationship', label: '元記事', relationTo: 'events', admin: { readOnly: true, description: '公開済みイベントから作成した作業下書きの元記事' } },
+    { name: 'sourceEvent', type: 'relationship', label: '元記事', relationTo: 'events', admin: { readOnly: true, description: '公開済みイベントから作成した作業下書きの元記事', condition: (data) => Boolean(data?.sourceEvent) } },
     // DiscordIDは差し戻し通知でのメンションや「自分の記事のみ表示」の絞り込みにのみ使う内部値なので画面には出さない。
     { name: 'createdByDiscordId', type: 'text', label: '作成者DiscordID', admin: { hidden: true } },
-    { name: 'createdByUsername', type: 'text', label: '作成者', admin: { readOnly: true, position: 'sidebar' } },
+    { name: 'createdByUsername', type: 'text', label: '作成者', admin: { readOnly: true, position: 'sidebar', condition: (data) => Boolean(data?.createdByUsername) } },
     // 直近の確認依頼者。作成者と依頼者が異なるケース（他の編集者が引き継いで依頼するなど）があるため別管理し、
     // 一覧・レビュー画面（EventStatusActions）で「誰が書いたか」と並べて表示する。
     { name: 'reviewRequestedByDiscordId', type: 'text', label: '確認依頼者DiscordID', admin: { hidden: true } },
-    { name: 'reviewRequestedByUsername', type: 'text', label: '確認依頼者', admin: { readOnly: true, position: 'sidebar' } },
+    { name: 'reviewRequestedByUsername', type: 'text', label: '確認依頼者', admin: { readOnly: true, position: 'sidebar', condition: (data) => Boolean(data?.reviewRequestedByUsername), components: { Cell: './src/cms/components/DashIfEmptyCell.tsx' } } },
   ],
 }

@@ -1,6 +1,10 @@
 async function sendReviewWebhook(content: string) {
   const url = process.env.DISCORD_REVIEW_WEBHOOK_URL
-  if (!url) return { delivered: false, reason: 'DISCORD_REVIEW_WEBHOOK_URL is not configured' }
+  // Preview/DevelopmentではWebhook未設定を想定し、本番Discordチャンネルを汚さずコンソールに書き出すだけにする。
+  if (!url) {
+    console.info(`[Discord通知(コンソール出力): DISCORD_REVIEW_WEBHOOK_URL未設定のため送信をスキップ]\n${content}`)
+    return { delivered: false, reason: 'DISCORD_REVIEW_WEBHOOK_URL is not configured' }
+  }
   const response = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ content }) })
   if (!response.ok) throw new Error(`Discord webhook failed: ${response.status}`)
   return { delivered: true }
