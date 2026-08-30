@@ -52,6 +52,13 @@ function statusMessage(status: EventStatus, canReview: boolean): string | null {
   return canReview ? '承認依頼が届いています。対応を決めてください' : '現在確認中です。承認が降りると公開されて通知が届きます'
 }
 
+// 削除は下書き状態のイベントのみ可能（管理者も例外なし）。一覧・編集画面どちらでも消せない状態があるため、
+// 「なぜ消せないか」を編集画面側で先に案内しておく。
+function deleteNote(status: EventStatus): string | null {
+  if (status === 'draft') return null
+  return '削除できるのは下書き状態のイベントのみです。削除したい場合は先に「編集する」等で下書きに戻してください'
+}
+
 // イベント編集画面のワークフロー操作。プルダウンだと本来許されない遷移(下書き→公開など)も選べてしまい
 // 保存時にエラーになって分かりにくいため、その時点で進める先だけをボタンとして出す。
 // サイドバーには全体の流れと現在地の案内だけを表示し、実際の操作ボタンは画面右下に固定表示する
@@ -75,6 +82,7 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
   // まだ一度も保存していない(id未確定の)新規作成中はどちらも参照できないため出さない。
   const previewUrl = !id ? null : isPublicNow && slug ? `${appUrl}/events/${slug}` : `${appUrl}/events/preview/${id}`
   const message = statusMessage(currentStatus, role === 'reviewer' || role === 'admin')
+  const deleteMessage = deleteNote(currentStatus)
 
   const handleClick = async (to: EventStatus) => {
     const previous = currentStatus
@@ -114,6 +122,7 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
           ))}
         </div>
         {message && <div className="event-status-actions__message">{message}</div>}
+        {deleteMessage && <div className="event-status-actions__message">{deleteMessage}</div>}
         {(authorName || requesterName) && (
           <div className="event-status-actions__people">
             {authorName && <div>作成者: {authorName}</div>}

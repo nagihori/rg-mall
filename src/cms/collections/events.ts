@@ -12,7 +12,7 @@ const statusLabels: Record<EventStatus, string> = { draft: '下書き', in_revie
 const dateTimeAdmin = { date: { pickerAppearance: 'dayAndTime' as const, displayFormat: 'yyyy/MM/dd HH:mm', timeFormat: 'HH:mm' } }
 
 export const Events: CollectionConfig = {
-  slug: 'events', labels: { singular: 'イベント', plural: 'イベント' }, admin: { useAsTitle: 'title', defaultColumns: ['title', 'status', 'createdByUsername', 'reviewRequestedByUsername', 'updatedAt'], components: { edit: { beforeDocumentControls: ['./src/cms/components/BackToListLink.tsx'] }, beforeList: ['./src/cms/components/EventListFilters.tsx'] } }, versions: { drafts: true, maxPerDoc: 20 }, trash: true,
+  slug: 'events', labels: { singular: 'イベント', plural: 'イベント' }, admin: { useAsTitle: 'title', defaultColumns: ['title', 'status', 'createdByUsername', 'reviewRequestedByUsername', 'updatedAt'], components: { edit: { beforeDocumentControls: ['./src/cms/components/BackToListLink.tsx'] }, beforeList: ['./src/cms/components/EventListFilters.tsx', './src/cms/components/EventDeleteGuardBanner.tsx'] } }, versions: { drafts: true, maxPerDoc: 20 }, trash: true,
   access: { read: canEdit, create: canEdit, update: canEdit, delete: canTrashDraft },
   hooks: {
     beforeValidate: [async ({ data, operation, req }) => {
@@ -85,7 +85,43 @@ export const Events: CollectionConfig = {
       }
       return doc
     }],
-    afterDelete: [async ({ doc, req }) => { await recordEventTransition(req, doc.id, 'deleted'); return doc }],
+    beforeOperation: [async ({ args, operation, overrideAccess }: any) => {
+      // 一覧画面の「削除」ボタンは、このコレクションのtrash:trueにより実際にはゴミ箱移動(update操作でdeletedAtを
+      // セットするPATCH)を叩く。完全削除(スキップ)の方はdelete操作。どちらもaccess側の`{ status: 'draft' }`
+      // 条件に合わない対象をエラーなく黙って除外するだけなので、ここで先に検知して明示的なエラーにしないと
+      // 「削除しました/ゴミ箱に移動しました」と表示されるのに実際は何も変わらない事故になる。
+      if (overrideAccess || !args.where) return args
+      const isPermanentDelete = operation === 'delete'
+      const isTrashMove = operation === 'update' && typeof args.data === 'object' && args.data !== null && 'deletedAt' in args.data && args.data.deletedAt != null
+      if (!isPermanentDelete && !isTrashMove) return args
+      const { req, where } = args
+      const { docs } = await req.payload.find({ collection: 'events', where, limit: 0, depth: 0, overrideAccess: true, trash: true, select: { title: true, status: true } })
+      const nonDraft = docs.filter((doc: any) => doc.status !== 'draft')
+      if (nonDraft.length > 0) {
+        const names = nonDraft.map((doc: any) => `「${doc.title}」(${statusLabels[doc.status as EventStatus] ?? doc.status})`).join('、')
+        throw new APIError(`${names} は下書き状態ではないため削除できません。削除できるのは下書き状態のイベントのみです。`, 400)
+      }
+      return args
+    }],
+    beforeDelete: [async ({ id, req }) => {
+      // access側(canTrashDraft)で下書き以外はすでに弾かれるが、overrideAccessでの呼び出しなど
+      // access層を経由しないケースへの保険と、分かりやすいエラーメッセージ表示を兼ねる。
+      // trash: trueにしないと、ゴミ箱に入っている(deletedAt設定済みの)イベントを完全削除しようとした際に
+      // このfindByID自体がNotFoundになり、ゴミ箱からの削除操作そのものが機能しなくなる。
+      const doc = await req.payload.findByID({ collection: 'events', id, req, overrideAccess: true, depth: 0, trash: true })
+      if (doc.status !== 'draft') {
+        throw new APIError(`「${statusLabels[doc.status as EventStatus] ?? doc.status}」のイベントは削除できません。削除できるのは下書き状態のイベントのみです。先に下書きへ差し戻してから削除してください。`, 400)
+      }
+      // 監査ログは削除の実行前に記録する。afterDeleteの時点だとevent(削除済みの行)を参照するINSERTになり
+      // 外部キー制約に必ず違反する。それが原因でDBトランザクションごと暗黙ロールバックされ、
+      // 「エラーは出ないのに実際は削除されていない」という事故になっていたため、この順序は変更しないこと。
+      try {
+        await recordEventTransition(req, id, 'deleted')
+      } catch (err) {
+        // 監査ログの記録に失敗しても削除自体は継続する
+        req.payload.logger.error({ err }, '削除の監査ログ記録に失敗しました')
+      }
+    }],
   },
   fields: [
     // 公開中は内容を直接編集できない設計。「編集する」ボタンで一旦下書きに戻してから編集する運用のため、
@@ -125,5 +161,8 @@ export const Events: CollectionConfig = {
     // 一覧・レビュー画面（EventStatusActions）で「誰が書いたか」と並べて表示する。
     { name: 'reviewRequestedByDiscordId', type: 'text', label: '確認依頼者DiscordID', admin: { hidden: true } },
     { name: 'reviewRequestedByUsername', type: 'text', label: '確認依頼者', admin: { readOnly: true, position: 'sidebar', condition: (data) => Boolean(data?.reviewRequestedByUsername), components: { Cell: './src/cms/components/DashIfEmptyCell.tsx' } } },
+    // Payloadが自動追加するupdatedAtは表示形式を指定できないため、一覧(defaultColumns)にも
+    // dateTimeAdminと同じ書式を効かせるためにここで明示的に上書きする。
+    { name: 'updatedAt', type: 'date', label: '更新日時', admin: { disableBulkEdit: true, hidden: true, ...dateTimeAdmin }, index: true },
   ],
 }

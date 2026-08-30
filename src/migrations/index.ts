@@ -7,6 +7,7 @@ import * as migration_20260830_000000_media_sizes from './20260830_000000_media_
 import * as migration_20260830_010000_events_created_by_discord from './20260830_010000_events_created_by_discord';
 import * as migration_20260830_020000_events_created_by_username from './20260830_020000_events_created_by_username';
 import * as migration_20260830_030000_events_location_and_review_requester from './20260830_030000_events_location_and_review_requester';
+import * as migration_20260830_040000_events_deleted_at from './20260830_040000_events_deleted_at';
 
 export const migrations = [
   {
@@ -53,5 +54,10 @@ export const migrations = [
     up: migration_20260830_030000_events_location_and_review_requester.up,
     down: migration_20260830_030000_events_location_and_review_requester.down,
     name: '20260830_030000_events_location_and_review_requester'
+  },
+  {
+    up: migration_20260830_040000_events_deleted_at.up,
+    down: migration_20260830_040000_events_deleted_at.down,
+    name: '20260830_040000_events_deleted_at'
   },
 ];

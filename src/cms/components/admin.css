@@ -139,6 +139,18 @@ body,
   color: var(--theme-text);
 }
 
+/* 一覧で選択中に下書き以外が混ざっている場合の警告。削除ボタン自体は非活性にできないため、
+   「押しても消えない」ことに操作前に気づけるよう目立たせる。 */
+.event-delete-guard-banner {
+  margin-bottom: var(--base);
+  padding: calc(var(--base) / 2) var(--base);
+  border-radius: 4px;
+  background: var(--theme-warning-100);
+  color: var(--theme-warning-750);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
 /* 実際の操作ボタンは画面幅に関わらず下部に帯として固定し、本文をどれだけスクロールしても
    常に手が届く位置に置く。内容を書き終えたら流れるように押せるよう、大きく・目立つ色・中央揃えにする。 */
 .event-status-actions__bar {

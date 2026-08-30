@@ -32,6 +32,18 @@ export default buildConfig({
   i18n: {
     fallbackLanguage: 'ja',
     supportedLanguages: { ja, en },
+    // 一覧の一括削除/ゴミ箱移動は、対象外(下書き以外)の記事を含む場合にエラーなく黙って0件処理される
+    // Payload標準の仕様があり、その際の成功トーストが「0件を削除しました」のように見えて紛らわしいため、
+    // 件数0の場合だけ文言を上書きする（1件以上削除できた場合の通常文言はそのまま）。
+    translations: {
+      ja: {
+        general: {
+          deletedCountSuccessfully_zero: '0件でした。選択した記事は下書き状態ではないため削除できません。',
+          permanentlyDeletedCountSuccessfully_zero: '0件でした。選択した記事は下書き状態ではないため完全削除できません。',
+          trashedCountSuccessfully_zero: '0件でした。選択した記事は下書き状態ではないためゴミ箱に移動できません。',
+        },
+      },
+    },
   },
   editor: lexicalEditor(),
   sharp,

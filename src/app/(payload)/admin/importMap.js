@@ -24,6 +24,7 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { default as default_2105476dcea4e27f12104288e3505c8b } from '../../../../src/cms/components/EventStatusActions.tsx'
 import { default as default_4c7545cb12888b52c4a304a6ecaa5e5c } from '../../../../src/cms/components/DashIfEmptyCell.tsx'
 import { default as default_f39cac6ec8531b165925d1ed0ec157b1 } from '../../../../src/cms/components/EventListFilters.tsx'
+import { default as default_8b881b7389570e5d31b6b5a2a9fb852c } from '../../../../src/cms/components/EventDeleteGuardBanner.tsx'
 import { default as default_b050d39f49b13567d6d8923cd217d24f } from '../../../../src/cms/components/BackToListLink.tsx'
 import { default as default_867b02c2a4abc2c081fd26e0d6db3a82 } from '../../../../src/cms/components/MediaListDefaultFilter.tsx'
 import { default as default_38da05dcd2e2f5cc44d568855002a48f } from '../../../../src/cms/components/DiscordLoginButton.tsx'
@@ -59,6 +60,7 @@ export const importMap = {
   "./src/cms/components/EventStatusActions.tsx#default": default_2105476dcea4e27f12104288e3505c8b,
   "./src/cms/components/DashIfEmptyCell.tsx#default": default_4c7545cb12888b52c4a304a6ecaa5e5c,
   "./src/cms/components/EventListFilters.tsx#default": default_f39cac6ec8531b165925d1ed0ec157b1,
+  "./src/cms/components/EventDeleteGuardBanner.tsx#default": default_8b881b7389570e5d31b6b5a2a9fb852c,
   "./src/cms/components/BackToListLink.tsx#default": default_b050d39f49b13567d6d8923cd217d24f,
   "./src/cms/components/MediaListDefaultFilter.tsx#default": default_867b02c2a4abc2c081fd26e0d6db3a82,
   "./src/cms/components/DiscordLoginButton.tsx#default": default_38da05dcd2e2f5cc44d568855002a48f,
