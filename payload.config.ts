@@ -50,7 +50,16 @@ export default buildConfig({
   collections: [Users, Events, Media, AuditLogs],
   plugins: [
     vercelBlobStorage({
-      collections: { media: true },
+      collections: {
+        media: {
+          // falseのままだと画像配信がPayload内蔵の/api/media/file/[filename]ルート経由になり、
+          // mediaコレクションのaccess.read(editor/reviewer/admin限定)がファイル取得のたびに評価される。
+          // 結果、ログインしていない一般訪問者は画像を一切取得できず403になる(公開ページの画像が
+          // 出たり出なかったりする不具合の原因だった)。Blobバケット自体は公開設定なので、
+          // ここを外して直接Blobの公開URLを返すようにする。
+          disablePayloadAccessControl: true,
+        },
+      },
       // addRandomSuffix:trueは既知の未修正バグでimageSizesと組み合わせると発火する
       // (originalとサイズ違いの複数アップロードが同じdocオブジェクトを共有して並行実行され、
       // 最後に完了したものでfilenameが上書きされ、他のサイズのURLが404になる)。
