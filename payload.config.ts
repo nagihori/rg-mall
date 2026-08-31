@@ -52,9 +52,10 @@ export default buildConfig({
     vercelBlobStorage({
       collections: { media: true },
       addRandomSuffix: true,
-      // Vercel上ではデフォルト挙動(BLOB_READ_WRITE_TOKEN / OIDC接続)のまま。
-      // ローカルはVercelと分離したBLOB_LOCAL_READ_WRITE_TOKENを明示指定する。
-      token: process.env.VERCEL ? undefined : process.env.BLOB_LOCAL_READ_WRITE_TOKEN,
+      // storage-vercel-blobはtokenが未指定だとアダプタ自体を無効化する(自動フォールバックはない)ため、
+      // Vercel上ではBLOB_READ_WRITE_TOKEN(環境ごとにスコープされた値)を明示的に渡す。
+      // ローカルはVercelと分離したBLOB_LOCAL_READ_WRITE_TOKENを使う。
+      token: process.env.VERCEL ? process.env.BLOB_READ_WRITE_TOKEN : process.env.BLOB_LOCAL_READ_WRITE_TOKEN,
     }),
   ],
   db: postgresAdapter({
