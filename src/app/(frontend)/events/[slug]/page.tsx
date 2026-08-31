@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
 import { getPublicEvent } from '@/lib/repositories/events'
-export const dynamic = 'force-dynamic'
+export const revalidate = 60
 export default async function EventPage({ params }: { params: Promise<{ slug: string }> }) {
   const event = await getPublicEvent((await params).slug)
   if (!event) notFound()
