@@ -19,6 +19,7 @@
     "@payloadcms/richtext-lexical": "^3.88.0",
     "@payloadcms/storage-vercel-blob": "^3.88.0",
     "@vercel/blob": "^2.8.0",
+    "@vercel/speed-insights": "^2.0.0",
     "next": "^16.3.3",
     "payload": "^3.88.0",
     "react": "^19.2.3",
