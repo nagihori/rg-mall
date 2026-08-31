@@ -3,17 +3,16 @@ import { APIError } from 'payload'
 import { canEdit, canReview, canTrashDraft } from '../access'
 import { normalizeSummary, normalizeTitle, numberedSlug, slugFromTitle } from '@/lib/normalize/event'
 import { eventInputSchema } from '@/lib/validate/event'
-import { canTransition, type EventStatus } from '@/lib/domain/events'
+import { canTransition, eventStatusLabels as statusLabels, eventStatuses, type EventStatus } from '@/lib/domain/events'
 import { recordEventTransition } from '../audit'
 import { notifyArchived, notifyPublished, notifyReturnedToDraft, notifyReviewRequested } from '@/lib/integrations/discord'
 import { revalidatePublicEventPaths } from '@/lib/cache/revalidateEvents'
 
-const statusLabels: Record<EventStatus, string> = { draft: '下書き', in_review: '確認待ち', published: 'トップページに表示中', archived: '過去のイベント' }
 // 日時は表記揺れを避けるため常に YYYY/MM/DD HH:mm(24時間表記)で統一する。
 const dateTimeAdmin = { date: { pickerAppearance: 'dayAndTime' as const, displayFormat: 'yyyy/MM/dd HH:mm', timeFormat: 'HH:mm' } }
 
 export const Events: CollectionConfig = {
-  slug: 'events', labels: { singular: 'イベント', plural: 'イベント' }, admin: { useAsTitle: 'title', defaultColumns: ['title', 'status', 'createdByUsername', 'reviewRequestedByUsername', 'updatedAt'], components: { edit: { beforeDocumentControls: ['./src/cms/components/BackToListLink.tsx'] }, beforeList: ['./src/cms/components/EventListFilters.tsx', './src/cms/components/EventDeleteGuardBanner.tsx'] } }, versions: { drafts: true, maxPerDoc: 20 }, trash: true,
+  slug: 'events', labels: { singular: 'イベント', plural: 'イベント' }, admin: { useAsTitle: 'title', defaultColumns: ['title', 'status', 'createdByUsername', 'reviewRequestedByUsername', 'updatedAt'], components: { edit: { beforeDocumentControls: ['./src/cms/components/BackToListLink.tsx'], Status: './src/cms/components/EventStatusBadge.tsx' }, beforeList: ['./src/cms/components/EventListFilters.tsx', './src/cms/components/EventDeleteGuardBanner.tsx'] } }, versions: { drafts: true, maxPerDoc: 20 }, trash: true,
   access: { read: canEdit, create: canEdit, update: canEdit, delete: canTrashDraft },
   hooks: {
     beforeValidate: [async ({ data, operation, req }) => {
@@ -157,7 +156,7 @@ export const Events: CollectionConfig = {
       // versions.drafts が内部的に追加する `_status` フィールドとPostgres enum型名が
       // 衝突する（toSnakeCase('_status') === toSnakeCase('status')）ため、enumNameで分離する。
       enumName: 'enum_events_review_status',
-      options: [{ label: '下書き', value: 'draft' }, { label: '確認待ち', value: 'in_review' }, { label: 'トップページに表示中', value: 'published' }, { label: '過去のイベント', value: 'archived' }],
+      options: eventStatuses.map((status) => ({ label: statusLabels[status], value: status })),
       // 操作ボタンは画面右下に固定表示するカスタムUIに統一しているため、ここはワークフローの説明表示に徹する。
       // (Payload標準の「ドラフトを保存/変更内容を公開」はsrc/cms/components/admin.cssで非表示にしている)
       admin: { position: 'sidebar', components: { Field: './src/cms/components/EventStatusActions.tsx' } },
