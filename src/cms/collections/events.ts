@@ -53,9 +53,13 @@ export const Events: CollectionConfig = {
         throw new APIError(`ステータスを「${statusLabels[previousStatus] ?? previousStatus}」から「${statusLabels[nextStatus] ?? nextStatus}」へ直接変更することはできません`, 400)
       }
       if (nextStatus === 'published' && !canReview({ req })) throw new APIError('公開は確認者または管理者のみ実行できます', 403)
-      if (nextStatus === 'published') {
+      // 開始/終了日時などの内容チェックは確認申請の時点で行う。公開承認まで見送ると
+      // 「確認待ちには入れるが公開だけ弾かれる」状態になり分かりにくいため。
+      if (nextStatus === 'in_review' || nextStatus === 'published') {
         const parsed = eventInputSchema.safeParse(next)
         if (!parsed.success) throw new APIError(parsed.error.issues.map((issue) => issue.message).join(' / '), 400)
+      }
+      if (nextStatus === 'published') {
         next.publishedAt = new Date().toISOString()
       }
       return next
@@ -169,5 +173,7 @@ export const Events: CollectionConfig = {
     // Payloadが自動追加するupdatedAtは表示形式を指定できないため、一覧(defaultColumns)にも
     // dateTimeAdminと同じ書式を効かせるためにここで明示的に上書きする。
     { name: 'updatedAt', type: 'date', label: '更新日時', admin: { disableBulkEdit: true, hidden: true, ...dateTimeAdmin }, index: true },
+    // updatedAtと同じ理由(Payloadが自動追加するcreatedAtは表示形式を指定できない)でここで明示的に上書きする。
+    { name: 'createdAt', type: 'date', label: '作成日時', admin: { disableBulkEdit: true, hidden: true, ...dateTimeAdmin }, index: true },
   ],
 }

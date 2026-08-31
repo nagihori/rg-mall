@@ -224,3 +224,10 @@ body,
   background: var(--theme-elevation-100);
   color: var(--theme-text);
 }
+
+/* サイドバー(開始/終了日時)の日時ピッカーはoverflow-y:autoなサイドバー枠内にあり、
+   カレンダー横に開く時刻リストがサイドバー幅を超えると枠に切られて選べなくなる。
+   ピッカーを開いている間だけ枠のoverflowを解除して、時刻リストがはみ出しても操作できるようにする。 */
+.document-fields__sidebar-wrap:has(.react-datepicker-popper) {
+  overflow: visible;
+}
