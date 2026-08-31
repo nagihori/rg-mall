@@ -102,12 +102,17 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
     await submit({ overrides: { status: to } })
     // submit() の戻り値は当てにならない（サーバーが拒否しても検知できない）ため、
     // 保存後に実際のドキュメントを読み直してボタンの見た目を正しい状態に合わせ直す。
+    // このsetValueはあくまで表示の同期用で内容の変更ではないため、直後にmodifiedを
+    // 戻しておかないと「保存済みなのに保存されていません」警告が誤って出てしまう。
     try {
       const res = await fetch(`/api/${collectionSlug}/${id}?depth=0`, { credentials: 'include' })
       const doc = res.ok ? await res.json() : null
       setValue(doc?.status ?? previous)
     } catch {
       setValue(previous)
+    } finally {
+      // setValueの内部処理が次のtickでmodifiedを再度立てることがあるため、1tick後にリセットする。
+      setTimeout(() => setModified(false), 0)
     }
   }
 
