@@ -1,1 +1,40 @@
-:root { --color-bg: #10151c; --color-surface: #1a232e; --color-text: #f7f5ee; --color-muted: #b7c1cc; --color-accent: #ffce57; --space-1: .5rem; --space-2: 1rem; --space-3: 1.5rem; --space-4: 2.5rem; --font-body: system-ui, sans-serif; --text-sm: .875rem; --text-base: 1rem; --text-lg: 1.5rem; --text-xl: 2.25rem; }
+:root {
+  /* 石壁のアイボリー地 */
+  --color-bg: #F3ECDC;
+  --color-surface: #FBF7EE;
+  /* 錬鉄の黒 */
+  --color-ink: #211C15;
+  --color-iron: #24211B;
+  --color-text: var(--color-ink);
+  --color-muted: #7C7261;
+  --color-border: #DBCEAD;
+  /* 真鍮のゴールド */
+  --color-gold: #AD8A3E;
+  --color-gold-soft: #D9C48C;
+  /* 書店の緑 / カフェの紺 */
+  --color-green: #33503F;
+  --color-navy: #29394F;
+  /* リボン(近日開催/開催中)用の深いワインレッド */
+  --color-ribbon: #6E2430;
+
+  --space-1: .5rem;
+  --space-2: 1rem;
+  --space-3: 1.75rem;
+  --space-4: 3rem;
+  --space-5: 4.5rem;
+
+  --font-display: var(--font-mincho), "Shippori Mincho B1", serif;
+  --font-body: var(--font-gothic), "Zen Kaku Gothic New", sans-serif;
+
+  --text-xs: .75rem;
+  --text-sm: .875rem;
+  --text-base: 1rem;
+  --text-lg: 1.375rem;
+  --text-xl: 2rem;
+  --text-2xl: 2.75rem;
+
+  --radius-sm: 4px;
+  --shadow-card: 0 1px 0 rgba(33, 28, 21, .06), 0 10px 24px -18px rgba(33, 28, 21, .4);
+  /* 実際の掲載画像はA4縦のポスター寄りが多いため、サムネイルは横長でなくやや縦長にしておく */
+  --thumb-ratio: 4 / 5;
+}

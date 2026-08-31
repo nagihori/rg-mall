@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-export const metadata: Metadata = { title: '承認待ち | RG Mall CMS' }
+export const metadata: Metadata = { title: '承認待ち', robots: { index: false, follow: false } }
 
 export default function LoginPendingPage() {
   return (

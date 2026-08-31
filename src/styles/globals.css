@@ -1,8 +1,274 @@
 @import './tokens.css';
-* { box-sizing: border-box; } body { margin: 0; background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); } a { color: var(--color-accent); } img { max-width: 100%; height: auto; border-radius: .5rem; } .container { max-width: 72rem; margin: auto; padding: var(--space-4) var(--space-2); } section { margin-block: var(--space-4); } .grid { display: grid; gap: var(--space-2); grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); } .card { background: var(--color-surface); padding: var(--space-3); border-radius: .75rem; } .card-thumb { display: block; margin-bottom: var(--space-2); } .card-thumb img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; margin: 0; border-radius: .5rem; } .eyebrow { color: var(--color-muted); font-size: var(--text-sm); text-transform: uppercase; }
-header h1 { font-size: 3rem; margin: 0; } header h2 { font-size: var(--text-lg); margin: var(--space-1) 0 0; color: var(--color-muted); font-weight: normal; } .back-link { display: inline-block; margin-block: var(--space-3); }
-.prose { max-width: 48rem; line-height: 1.8; } .prose h1 { font-size: var(--text-xl); } .prose h2 { font-size: var(--text-lg); margin-block: var(--space-3) var(--space-1); } .prose p, .prose ul { color: var(--color-text); } .prose ul { padding-left: 1.25em; }
+
+* { box-sizing: border-box; }
+
+html { overflow-x: hidden; }
+body {
+  margin: 0;
+  /* 100vwへのフルブリード(.event-hero等)はスクロールバー幅の分だけはみ出しうるため、横スクロールを明示的に止める */
+  overflow-x: hidden;
+  background: var(--color-bg);
+  /* 水彩紙のわずかな滲みを、面全体に薄いグレインとして敷く */
+  background-image: radial-gradient(rgba(33, 28, 21, .05) 1px, transparent 1px);
+  background-size: 3px 3px;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  line-height: 1.7;
+}
+
+a { color: var(--color-green); text-decoration-color: var(--color-gold-soft); text-underline-offset: .2em; }
+a:hover { color: var(--color-gold); }
+
+/* 読み込み中は淡いパーチメント色を敷いておき、届いた画像がふっと浮かぶようにする */
+img { max-width: 100%; height: auto; border-radius: var(--radius-sm); background: var(--color-border); }
+
+.container { max-width: 72rem; margin: auto; padding: var(--space-4) var(--space-2); }
+section { margin-block: var(--space-4); }
+
+.grid { display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); }
+
+/* --- サイト共通ヘッダー(門のアーチ看板そのもの) --- */
+.site-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-3) var(--space-2) var(--space-1);
+  background: var(--color-bg);
+}
+/* 透過PNGなので、読み込み中プレースホルダーの地色は乗せない */
+.site-header img { width: 100%; max-width: 30rem; height: auto; border-radius: 0; background: none; }
+.site-tagline {
+  max-width: 34rem;
+  margin: var(--space-1) 0 0;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  line-height: 1.8;
+  text-align: center;
+}
+
+/* ページ固有の見出し(archive・event詳細・イベント一覧) */
+main > h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  color: var(--color-ink);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-1);
+}
+
+section > h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--color-ink);
+  position: relative;
+  padding-left: var(--space-2);
+}
+section > h2::before { content: ''; position: absolute; left: 0; top: .15em; bottom: .15em; width: 3px; background: var(--color-gold); }
+
+/* --- 店頭プレート風の小さなカテゴリ表示 --- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .4em;
+  margin: 0 0 var(--space-1);
+  padding: .3em .75em;
+  background: var(--color-iron);
+  color: var(--badge-fg, var(--color-gold-soft));
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: .08em;
+  border: 1px solid var(--badge-accent, var(--color-gold));
+  border-radius: 2px;
+}
+.badge::before { content: '◆'; font-size: .65em; color: var(--badge-accent, var(--color-gold)); }
+.badge-ongoing { --badge-accent: var(--color-gold); --badge-fg: #EFE2C0; }
+.badge-upcoming { --badge-accent: var(--color-navy); --badge-fg: #C9D3E1; }
+.badge-new { --badge-accent: var(--color-green); --badge-fg: #CFE1D3; }
+.badge-archive { --badge-accent: var(--color-muted); --badge-fg: #DED4BC; }
+
+/* --- イベントカード(店先の一枚看板) --- */
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card);
+}
+.card h3 { margin: 0 0 var(--space-1); font-family: var(--font-display); font-size: var(--text-lg); }
+.card h3 a { color: var(--color-ink); text-decoration: none; }
+.card h3 a:hover { color: var(--color-gold); }
+.card > p { margin: 0 0 var(--space-1); color: var(--color-muted); font-size: var(--text-sm); }
+.card-thumb { display: block; margin-bottom: var(--space-2); }
+.card-thumb img { display: block; width: 100%; aspect-ratio: var(--thumb-ratio); object-fit: cover; margin: 0; border-radius: var(--radius-sm); }
+
+/* --- トップページ「注目のイベント」枠(大きな一枚看板+小さな一覧) --- */
+/* ヒーローは横幅を頭打ちにして固定、コンパクト一覧は残り幅いっぱいまでフレキシブルに広がる */
+.featured { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: start; }
+.featured-hero { flex: 0 1 24rem; }
+@media (max-width: 42rem) { .featured-hero { flex-basis: 100%; } }
+
+.featured-hero h3 { margin: 0 0 var(--space-1); font-family: var(--font-display); font-size: var(--text-lg); }
+.featured-hero h3 a, .featured-compact h3 a, .past-card h3 a { color: var(--color-ink); text-decoration: none; }
+.featured-hero h3 a:hover, .featured-compact h3 a:hover, .past-card h3 a:hover { color: var(--color-gold); }
+.featured-hero-thumb { position: relative; display: block; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-sm); box-shadow: var(--shadow-card); }
+.featured-hero-thumb img { display: block; width: 100%; aspect-ratio: var(--thumb-ratio); object-fit: cover; margin: 0; border-radius: 0; }
+.featured-hero > p { margin: var(--space-1) 0 0; color: var(--color-muted); font-size: var(--text-sm); }
+
+.featured-list { flex: 1 1 18rem; display: flex; flex-direction: column; gap: var(--space-3); }
+.featured-compact { display: flex; gap: var(--space-2); }
+.featured-compact-thumb { position: relative; flex: 0 0 9rem; display: block; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+.featured-compact-thumb img { display: block; width: 100%; aspect-ratio: var(--thumb-ratio); object-fit: cover; margin: 0; border-radius: 0; }
+.featured-compact h3 { margin: .2em 0; font-size: var(--text-base); }
+.featured-compact > div { min-width: 0; }
+.featured-compact p { margin: 0; color: var(--color-muted); font-size: var(--text-sm); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* 開催中/近日開催を知らせる斜めリボン(画像右上に掛ける) */
+.ribbon {
+  position: absolute; top: .7rem; right: -2.4rem; width: 8.5rem;
+  background: var(--color-ribbon); color: var(--color-bg);
+  text-align: center; font-size: var(--text-xs); letter-spacing: .05em;
+  padding: .35em 0; transform: rotate(40deg); box-shadow: 0 1px 6px rgba(33, 28, 21, .4);
+  /* 外周にワインレッドの縁取り、1px内側に金の破線ステッチ */
+  border-top: 1px solid var(--color-ribbon);
+  border-bottom: 1px solid var(--color-ribbon);
+}
+.ribbon::before, .ribbon::after { content: ''; position: absolute; left: .3em; right: .3em; }
+.ribbon::before { top: 1px; border-top: 1px dashed var(--color-gold-soft); }
+.ribbon::after { bottom: 1px; border-bottom: 1px dashed var(--color-gold-soft); }
+/* 開始日を示す黒プレート。ヒーローでは画像に重ねる、一覧では見出しの上に単体で置く */
+.date-tag {
+  background: var(--color-iron); color: var(--color-bg);
+  font-size: var(--text-xs); letter-spacing: .04em;
+  padding: .25em .6em; border-radius: 2px;
+}
+.featured-hero-thumb .date-tag, .featured-compact-thumb .date-tag { position: absolute; right: .5rem; bottom: .5rem; }
+.date-tag--inline { display: inline-block; margin-bottom: .3em; }
+
+.empty-note { color: var(--color-muted); }
+
+/* --- これまでのイベント(過去回のダイジェスト) --- */
+.past-section { display: grid; grid-template-columns: 1fr auto; align-items: baseline; column-gap: var(--space-2); }
+.past-section .grid { grid-column: 1 / -1; }
+.past-section .more-link { font-size: var(--text-sm); white-space: nowrap; }
+.past-card h3 { margin: 0 0 var(--space-1); font-family: var(--font-display); font-size: var(--text-base); }
+.past-card-thumb { display: block; margin-bottom: var(--space-1); overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-sm); box-shadow: var(--shadow-card); }
+.past-card-thumb img { display: block; width: 100%; aspect-ratio: var(--thumb-ratio); object-fit: cover; margin: 0; border-radius: 0; }
+.past-card > p { margin: 0; color: var(--color-muted); font-size: var(--text-sm); }
+
+/* --- イベント詳細ページ(共通ヘッダー/フッターを外した独立ページ) --- */
+.event-page { max-width: 44rem; margin: 0 auto; padding: 0 var(--space-2) var(--space-4); }
+/* 戻り導線だけの細い帯。ヒーローの上に独立したコンポーネントとして乗せる */
+.back-to-top-bar { margin: 0 calc(50% - 50vw); background: var(--color-iron); }
+.back-to-top-link { display: block; padding: .6em var(--space-2); color: var(--color-gold-soft); font-size: var(--text-sm); text-decoration: none; }
+.back-to-top-link:hover { color: var(--color-bg); }
+/* ヒーローだけ100vwにフルブリードし、メイン画像を敷いてグラデーションで沈める(フッターと同じ考え方) */
+.event-hero {
+  position: relative; overflow: hidden;
+  min-height: 18rem;
+  margin: 0 calc(50% - 50vw) var(--space-4);
+  background: linear-gradient(135deg, var(--color-iron), #17140f);
+  color: var(--color-bg);
+}
+.event-hero-bg { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; margin: 0; border-radius: 0; }
+.event-hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(23, 20, 15, .35) 0%, rgba(23, 20, 15, .55) 55%, rgba(23, 20, 15, .88) 100%);
+}
+.event-hero-inner { position: relative; z-index: 1; max-width: 44rem; margin: 0 auto; padding: var(--space-3) var(--space-2) var(--space-4); }
+.event-preview-flag { display: inline-block; margin: 0 0 var(--space-1); color: var(--color-gold-soft); font-size: var(--text-xs); letter-spacing: .1em; text-transform: uppercase; }
+.event-hero-inner h1 { margin: 0 0 var(--space-2); font-family: var(--font-display); font-size: var(--text-xl); color: var(--color-bg); }
+.event-hero-inner .date-tag { background: rgba(0, 0, 0, .4); border: 1px solid var(--color-gold); color: var(--color-bg); }
+
+.event-info { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-4); }
+.event-info-media { display: block; flex: 1 1 20rem; max-width: 28rem; overflow: hidden; background: none; padding: 0; border: 1px solid var(--color-border); border-radius: var(--radius-sm); box-shadow: var(--shadow-card); cursor: zoom-in; }
+.event-info-media img { display: block; width: 100%; aspect-ratio: var(--thumb-ratio); object-fit: cover; margin: 0; border-radius: 0; }
+.event-info-meta { flex: 1 1 14rem; }
+.event-info-meta > p { margin: 0 0 var(--space-2); }
+.event-info-meta dl { margin: 0; }
+.event-info-meta dt { margin-top: var(--space-2); color: var(--color-muted); font-size: var(--text-xs); letter-spacing: .08em; text-transform: uppercase; }
+.event-info-meta dt:first-child { margin-top: 0; }
+.event-info-meta dd { margin: .15em 0 0; }
+
+/* --- 前後のイベントへのナビゲーション --- */
+.event-pagination { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--color-border); }
+.event-pagination-link {
+  display: block; min-width: 0; padding: var(--space-2);
+  border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface);
+  color: var(--color-ink); text-decoration: none;
+}
+.event-pagination-link:hover { border-color: var(--color-gold); }
+.event-pagination-next { text-align: right; }
+.event-pagination-label { display: block; margin-bottom: .3em; color: var(--color-muted); font-size: var(--text-xs); letter-spacing: .08em; }
+.event-pagination-title {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  font-family: var(--font-display); line-height: 1.5;
+}
+
+/* --- イベント詳細のギャラリー(店先に並ぶ写真立て) --- */
+.gallery { display: grid; gap: var(--space-2); grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); margin-block: var(--space-3); }
+.gallery-item { display: block; background: none; padding: 0; border: 1px solid var(--color-border); border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow-card); cursor: zoom-in; }
+.gallery-item img { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; margin: 0; border-radius: 0; transition: transform .2s ease; }
+.gallery-item:hover img { transform: scale(1.05); }
+
+.back-link { display: inline-block; margin-block: var(--space-3); font-size: var(--text-sm); }
+
+.prose { max-width: 48rem; line-height: 1.85; }
+.prose h1 { font-family: var(--font-display); font-size: var(--text-xl); }
+.prose h2 { font-family: var(--font-display); font-size: var(--text-lg); margin-block: var(--space-3) var(--space-1); }
+.prose p, .prose ul { color: var(--color-text); }
+.prose ul, .prose ol { padding-left: 1.25em; }
+.prose blockquote { margin: var(--space-2) 0; padding-left: var(--space-2); border-left: 3px solid var(--color-gold); color: var(--color-muted); }
+.prose code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--color-bg); padding: .1em .4em; border-radius: 3px; font-size: .9em; }
+.prose hr { border: none; border-top: 1px solid var(--color-border); margin-block: var(--space-3); }
 
 .loading-bar { position: fixed; top: 0; left: 0; width: 100%; height: 3px; overflow: hidden; background: transparent; z-index: 1000; }
-.loading-bar-fill { display: block; height: 100%; width: 40%; background: var(--color-accent); animation: loading-bar-slide 1.1s ease-in-out infinite; }
+.loading-bar-fill { display: block; height: 100%; width: 40%; background: var(--color-gold); animation: loading-bar-slide 1.1s ease-in-out infinite; }
 @keyframes loading-bar-slide { 0% { transform: translateX(-100%); } 50% { transform: translateX(150%); } 100% { transform: translateX(250%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-bar-fill { animation: none; }
+}
+
+/* --- サイト共通フッター(水彩の商店街風景に基本情報を重ねる) --- */
+.site-footer {
+  position: relative;
+  margin-top: var(--space-5);
+  aspect-ratio: 16 / 8;
+  min-height: 20rem;
+  overflow: hidden;
+  color: var(--color-bg);
+}
+.site-footer-bg { object-fit: cover; object-position: center 65%; border-radius: 0; }
+.site-footer-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 0%, transparent 45%, rgba(33, 28, 21, .55) 68%, rgba(33, 28, 21, .94) 100%);
+}
+.site-footer-content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: var(--space-4);
+}
+.site-footer-brand { margin: 0 0 var(--space-1); font-family: var(--font-display); font-size: var(--text-lg); letter-spacing: .04em; }
+.site-footer-link {
+  display: inline-flex; align-self: flex-start; align-items: center; gap: .4em;
+  margin: 0 0 var(--space-3);
+  padding: .35em 1em;
+  border: 1px solid var(--color-gold-soft);
+  border-radius: 999px;
+  background: rgba(33, 28, 21, .35);
+  color: var(--color-gold-soft);
+  font-size: var(--text-sm);
+  letter-spacing: .02em;
+  text-decoration: none;
+}
+.site-footer-link:hover { color: var(--color-bg); border-color: var(--color-bg); background: rgba(33, 28, 21, .55); }
+.site-footer-info { display: grid; gap: var(--space-2) var(--space-3); grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); margin: 0; }
+.site-footer-info dt { font-size: var(--text-xs); letter-spacing: .1em; color: var(--color-gold-soft); text-transform: uppercase; }
+.site-footer-info dd { margin: .1em 0 0; font-size: var(--text-sm); }
