@@ -234,6 +234,7 @@ section > h2::before { content: ''; position: absolute; left: 0; top: .15em; bot
 /* --- サイト共通フッター(水彩の商店街風景に基本情報を重ねる) --- */
 .site-footer {
   position: relative;
+  width: 100%; /* aspect-ratio+min-heightの組み合わせは、幅autoのままだと狭い画面でmin-heightから幅を逆算して画面幅を超えてしまうため明示する */
   margin-top: var(--space-5);
   aspect-ratio: 16 / 8;
   min-height: 20rem;
@@ -258,7 +259,7 @@ section > h2::before { content: ''; position: absolute; left: 0; top: .15em; bot
 .site-footer-brand { margin: 0 0 var(--space-1); font-family: var(--font-display); font-size: var(--text-lg); letter-spacing: .04em; }
 .site-footer-link {
   display: inline-flex; align-self: flex-start; align-items: center; gap: .4em;
-  margin: 0 0 var(--space-3);
+  max-width: 100%; margin: 0 0 var(--space-3);
   padding: .35em 1em;
   border: 1px solid var(--color-gold-soft);
   border-radius: 999px;
@@ -267,8 +268,12 @@ section > h2::before { content: ''; position: absolute; left: 0; top: .15em; bot
   font-size: var(--text-sm);
   letter-spacing: .02em;
   text-decoration: none;
+  white-space: normal;
 }
 .site-footer-link:hover { color: var(--color-bg); border-color: var(--color-bg); background: rgba(33, 28, 21, .55); }
 .site-footer-info { display: grid; gap: var(--space-2) var(--space-3); grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); margin: 0; }
+/* グリッドアイテムはデフォルトでmin-width:autoのため、狭い画面で文字がはみ出す前に折り返させる */
+.site-footer-info > div { min-width: 0; }
 .site-footer-info dt { font-size: var(--text-xs); letter-spacing: .1em; color: var(--color-gold-soft); text-transform: uppercase; }
-.site-footer-info dd { margin: .1em 0 0; font-size: var(--text-sm); }
+.site-footer-info dd { margin: .1em 0 0; font-size: var(--text-sm); overflow-wrap: break-word; }
+@media (max-width: 26rem) { .site-footer-info { grid-template-columns: 1fr; } }
