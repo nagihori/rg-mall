@@ -1,22 +1,21 @@
 'use client'
 
 import type { SelectFieldClientProps } from 'payload'
+import { useEffect } from 'react'
 import { Button, ConfirmationModal, useAuth, useDocumentInfo, useField, useForm, useModal } from '@payloadcms/ui'
-import type { EventStatus } from '@/lib/domain/events'
+import { eventStatusLabels as statusLabels, type EventStatus } from '@/lib/domain/events'
 
 type Role = 'admin' | 'editor' | 'reviewer'
 
-const statusLabels: Record<EventStatus, string> = { draft: '下書き', in_review: '確認待ち', published: 'トップページに表示中', archived: '過去のイベント' }
 const pipeline: EventStatus[] = ['draft', 'in_review', 'published', 'archived']
 const editConfirmModalSlug = 'event-status-edit-confirm'
 
 type Action = { key: string; to: EventStatus; label: string; description: string; requiresReview?: boolean; requiresConfirm?: boolean; style?: 'primary' | 'secondary' }
 
-// ステータスを変えずに今の内容だけ保存する操作。公開中のときだけ、保存すると確認待ちに戻る
-// （このプロジェクトの設計上、公開中の内容を直接書き換えることはできないため）ので、その旨を明記する。
-function saveAction(status: EventStatus): Action {
-  const description = status === 'published' ? '内容を保存します（確認待ちに戻ります）' : '内容を保存します（ステータスは変わりません）'
-  return { key: 'save', to: status, label: '保存する', description, style: 'secondary' }
+// ステータスを変えずに下書きの内容だけ保存する操作。下書き以外は本文が編集できない
+// (公開中はreadOnly)か、他の遷移ボタンが実質保存を兼ねるため、下書きのときだけ出す。
+function saveAction(): Action {
+  return { key: 'save', to: 'draft', label: '保存する', description: '内容を保存します（ステータスは変わりません）', style: 'secondary' }
 }
 
 // 「押すと何が起こるか」を役割ごとに言い切る。同じ遷移(例: 確認待ち→下書き)でも、
@@ -68,14 +67,16 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
   const { value: slug } = useField<string>({ path: 'slug' })
   const { value: authorName } = useField<string>({ path: 'createdByUsername' })
   const { value: requesterName } = useField<string>({ path: 'reviewRequestedByUsername' })
-  const { submit } = useForm()
+  const { setModified, submit } = useForm()
   const { id, collectionSlug } = useDocumentInfo()
   const { toggleModal } = useModal()
   const { user } = useAuth()
   const role = ((user as { role?: Role } | null)?.role ?? 'editor') as Role
   const currentStatus = (value ?? 'draft') as EventStatus
   const transitions = actionsFor(currentStatus, role).filter((action) => !action.requiresReview || role === 'reviewer' || role === 'admin')
-  const actions = [saveAction(currentStatus), ...transitions]
+  // 「保存する」は下書き中の内容保持のためだけの操作。確認待ち以降はステータス遷移ボタンが
+  // 実質的に保存を兼ねるため、下書きのときだけ出す。
+  const actions = currentStatus === 'draft' ? [saveAction(), ...transitions] : transitions
   const isPublicNow = currentStatus === 'published' || currentStatus === 'archived'
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
   // 公開中/過去のイベントは公開URLそのもの、下書き・確認待ちはステータスを無視して読めるプレビュー専用ルートを指す。
@@ -84,18 +85,33 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
   const message = statusMessage(currentStatus, role === 'reviewer' || role === 'admin')
   const deleteMessage = deleteNote(currentStatus)
 
+  // 公開中/過去のイベントは本文系フィールドがすべてaccess.updateでreadOnlyになり実際には
+  // 編集できないが、フォーム初期化のタイミングでPayload側のmodifiedフラグが誤って立つことがあり、
+  // 何も変更していないのに他ページへ移動しようとすると「内容が保存されていません」の確認が出てしまう。
+  // 実際に編集できない状態なので、表示直後にmodifiedを一度リセットしておく。
+  useEffect(() => {
+    if (currentStatus !== 'published' && currentStatus !== 'archived') return
+    const timer = setTimeout(() => setModified(false), 0)
+    return () => clearTimeout(timer)
+  }, [currentStatus, setModified])
+
   const handleClick = async (to: EventStatus) => {
     const previous = currentStatus
     setValue(to)
     await submit({ overrides: { status: to } })
     // submit() の戻り値は当てにならない（サーバーが拒否しても検知できない）ため、
     // 保存後に実際のドキュメントを読み直してボタンの見た目を正しい状態に合わせ直す。
+    // このsetValueはあくまで表示の同期用で内容の変更ではないため、直後にmodifiedを
+    // 戻しておかないと「保存済みなのに保存されていません」警告が誤って出てしまう。
     try {
       const res = await fetch(`/api/${collectionSlug}/${id}?depth=0`, { credentials: 'include' })
       const doc = res.ok ? await res.json() : null
       setValue(doc?.status ?? previous)
     } catch {
       setValue(previous)
+    } finally {
+      // setValueの内部処理が次のtickでmodifiedを再度立てることがあるため、1tick後にリセットする。
+      setTimeout(() => setModified(false), 0)
     }
   }
 

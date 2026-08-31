@@ -11,7 +11,8 @@ const timeFmt = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', hour:
 const shortFmt = dateFmt
 // 同日開催(1日のうち数時間)が多いため、開始日=終了日のときは終了日を省略して時刻だけにする
 function formatPeriod(startsAt?: string | null, endsAt?: string | null): string {
-  if (!startsAt || !endsAt) return '期間未定'
+  if (!startsAt) return '期間未定'
+  if (!endsAt) return `${dateFmt.format(new Date(startsAt))} ${timeFmt.format(new Date(startsAt))}〜`
   const start = new Date(startsAt)
   const end = new Date(endsAt)
   const startDate = dateFmt.format(start)
