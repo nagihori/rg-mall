@@ -10,6 +10,18 @@ async function sendReviewWebhook(content: string) {
   return { delivered: true }
 }
 
+export async function notifyApprovalNeeded(input: { discordUsername: string; userId: number | string; adminDiscordIds: string[] }) {
+  if (input.adminDiscordIds.length === 0) {
+    console.warn('[Discord通知: 承認可能なadminユーザーが存在しないため、メンション無しで送信します]')
+  }
+  const mentions = input.adminDiscordIds.map((id) => `<@${id}>`).join(' ')
+  const usersUrl = `${process.env.NEXT_PUBLIC_APP_URL}/admin/collections/users/${input.userId}`
+  return sendReviewWebhook(`
+      ### 🔔 新規ログイン申請があります ${mentions}
+      > **[${input.discordUsername}](${usersUrl})** さんが承認待ちです。管理画面から権限を割り当ててください。
+    `)
+}
+
 export async function notifyReviewRequested(input: { eventTitle: string; requester: string; reviewUrl: string; previewUrl: string }) {
   const reviewerRoleId = process.env.DISCORD_REVIEWER_ROLE_ID
   const mention = reviewerRoleId ? `<@&${reviewerRoleId}> ` : ''
