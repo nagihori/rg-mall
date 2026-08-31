@@ -3,6 +3,7 @@ import { generatePayloadCookie, jwtSign } from 'payload'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { exchangeDiscordCode, fetchDiscordUser } from '@/lib/integrations/discordOAuth'
+import { notifyApprovalNeeded } from '@/lib/integrations/discord'
 
 const STATE_COOKIE = 'discord_oauth_state'
 
@@ -49,6 +50,18 @@ export async function GET(request: NextRequest) {
       collection: 'users',
       data: { discordId: discordUser.id, discordUsername: discordUser.username, role: 'pending' },
       overrideAccess: true,
+    })
+
+    const admins = await payload.find({
+      collection: 'users',
+      where: { role: { equals: 'admin' } },
+      limit: 0,
+      overrideAccess: true,
+    })
+    await notifyApprovalNeeded({
+      discordUsername: discordUser.username,
+      userId: user.id,
+      adminDiscordIds: admins.docs.map((admin) => admin.discordId),
     })
   } else if (user.discordUsername !== discordUser.username) {
     user = await payload.update({
