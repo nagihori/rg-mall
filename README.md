@@ -62,6 +62,7 @@
 - `SPEC.md`: 要件、データモデル、入力・表示・検証ルール
 - `ROADMAP.md`: 段階的な実装範囲
 - `docs/architecture.md`: 責務、データフロー、保存・公開方針
+- `docs/development-deployment.md`: α版以降のブランチ、環境、デプロイ運用
 - `docs/editor-guide.md`: 更新担当者向けの操作ルール
 - `docs/adr/001-cms-selection.md`: CMS 選定の判断記録
 

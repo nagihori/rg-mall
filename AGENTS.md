@@ -30,6 +30,12 @@
 - URL 用 slug、検索用テキスト、表示用日時はサーバー側で生成または検証する。
 - 公開・取消・削除・権限変更は監査ログに残す。
 
+## 開発・デプロイ運用
+
+- ブランチと環境の対応、`staging` を経由する開発フローは [`docs/development-deployment.md`](docs/development-deployment.md) を正とする。
+- `main` は本番、`staging` は固定 URL の統合・受け入れテスト環境である。これら以外のブランチの Vercel Preview Deployment は個別確認用であり、外部サービスの Redirect URI を必要とする結合テストは `staging` で行う。
+- この運用を変更する実装・設定変更では、同文書と Vercel・外部サービスの環境別設定をあわせて確認する。
+
 ## 禁止事項
 
 - UI コンポーネント内に公開可否、日時判定、入力検証を重複実装すること。
