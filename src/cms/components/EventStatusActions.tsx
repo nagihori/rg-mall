@@ -3,11 +3,10 @@
 import type { SelectFieldClientProps } from 'payload'
 import { useEffect } from 'react'
 import { Button, ConfirmationModal, useAuth, useDocumentInfo, useField, useForm, useModal } from '@payloadcms/ui'
-import type { EventStatus } from '@/lib/domain/events'
+import { eventStatusLabels as statusLabels, type EventStatus } from '@/lib/domain/events'
 
 type Role = 'admin' | 'editor' | 'reviewer'
 
-const statusLabels: Record<EventStatus, string> = { draft: '下書き', in_review: '確認待ち', published: 'トップページに表示中', archived: '過去のイベント' }
 const pipeline: EventStatus[] = ['draft', 'in_review', 'published', 'archived']
 const editConfirmModalSlug = 'event-status-edit-confirm'
 

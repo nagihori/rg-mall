@@ -2,6 +2,10 @@ export const eventStatuses = ['draft', 'in_review', 'published', 'archived'] as 
 export type EventStatus = (typeof eventStatuses)[number]
 export type EventCategory = 'ongoing' | 'upcoming' | 'new' | 'archive'
 
+// 管理画面の一覧・編集画面・ステータスバッジなど表示箇所ごとに個別定義すると
+// 文言がずれるため、ここに一本化する。
+export const eventStatusLabels: Record<EventStatus, string> = { draft: '下書き', in_review: '確認待ち', published: 'トップページに表示中', archived: '過去のイベント' }
+
 const transitions: Record<EventStatus, readonly EventStatus[]> = {
   draft: ['in_review'], in_review: ['draft', 'published'], published: ['draft', 'archived'], archived: ['published'],
 }
