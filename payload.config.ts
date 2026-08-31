@@ -51,7 +51,12 @@ export default buildConfig({
   plugins: [
     vercelBlobStorage({
       collections: { media: true },
-      addRandomSuffix: true,
+      // addRandomSuffix:trueは既知の未修正バグでimageSizesと組み合わせると発火する
+      // (originalとサイズ違いの複数アップロードが同じdocオブジェクトを共有して並行実行され、
+      // 最後に完了したものでfilenameが上書きされ、他のサイズのURLが404になる)。
+      // https://github.com/payloadcms/payload/issues/9589
+      // Payload本体側の衝突回避(getSafeFileName)で十分なため、ここでは有効化しない。
+      addRandomSuffix: false,
       // storage-vercel-blobはtokenが未指定だとアダプタ自体を無効化する(自動フォールバックはない)ため、
       // Vercel上ではBLOB_READ_WRITE_TOKEN(環境ごとにスコープされた値)を明示的に渡す。
       // ローカルはVercelと分離したBLOB_LOCAL_READ_WRITE_TOKENを使う。
