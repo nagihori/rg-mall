@@ -6,6 +6,7 @@ import { eventInputSchema } from '@/lib/validate/event'
 import { canTransition, type EventStatus } from '@/lib/domain/events'
 import { recordEventTransition } from '../audit'
 import { notifyArchived, notifyPublished, notifyReturnedToDraft, notifyReviewRequested } from '@/lib/integrations/discord'
+import { revalidatePublicEventPaths } from '@/lib/cache/revalidateEvents'
 
 const statusLabels: Record<EventStatus, string> = { draft: '下書き', in_review: '確認待ち', published: 'トップページに表示中', archived: '過去のイベント' }
 // 日時は表記揺れを避けるため常に YYYY/MM/DD HH:mm(24時間表記)で統一する。
@@ -60,6 +61,9 @@ export const Events: CollectionConfig = {
       return next
     }],
     afterChange: [async ({ doc, previousDoc, req }) => {
+      // 公開/差し戻し/アーカイブだけでなく、ゴミ箱移動など公開に影響しない更新も含めて
+      // 変更のたびに公開ページのキャッシュを破棄する(頻度が低いぶん取りこぼしの方が困るため)。
+      revalidatePublicEventPaths(doc.slug)
       if (doc.status === previousDoc?.status) return doc
       const action = doc.status === 'published' ? 'published' : doc.status === 'archived' ? 'archived' : doc.status === 'draft' && previousDoc?.status === 'in_review' ? 'returned_to_draft' : null
       if (action) await recordEventTransition(req, doc.id, action)
@@ -121,6 +125,7 @@ export const Events: CollectionConfig = {
         // 監査ログの記録に失敗しても削除自体は継続する
         req.payload.logger.error({ err }, '削除の監査ログ記録に失敗しました')
       }
+      revalidatePublicEventPaths(doc.slug)
     }],
   },
   fields: [
