@@ -22,6 +22,15 @@ export async function notifyApprovalNeeded(input: { discordUsername: string; use
     `)
 }
 
+export async function notifyUserApproved(input: { discordUsername: string; discordId: string }) {
+  const mention = `<@${input.discordId}>`
+  const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/discord/login`
+  return sendReviewWebhook(`
+      ### ✅ ${mention} 管理画面に入れるようになりました
+      > もう一度 [こちらからログイン](${loginUrl}) してください
+    `)
+}
+
 export async function notifyReviewRequested(input: { eventTitle: string; requester: string; reviewUrl: string; previewUrl: string }) {
   const reviewerRoleId = process.env.DISCORD_REVIEWER_ROLE_ID
   const mention = reviewerRoleId ? `<@&${reviewerRoleId}> ` : ''
