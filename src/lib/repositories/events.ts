@@ -4,7 +4,17 @@ import config from '@payload-config'
 import { presentEventCard, presentEventDetail, presentEventPreview, type EventCardViewModel, type EventDetailViewModel, type PublicEvent } from '@/lib/presenters/event'
 
 function toEventImage(media: any) {
-  return typeof media === 'object' && media?.url ? { url: media.url, alt: media.alt, thumbnailUrl: media.sizes?.thumbnail?.url ?? null, cardUrl: media.sizes?.card?.url ?? null, detailUrl: media.sizes?.detail?.url ?? null } : null
+  return typeof media === 'object' && media?.url
+    ? {
+        url: media.url,
+        alt: media.alt,
+        thumbnailUrl: media.sizes?.thumbnail?.url ?? null,
+        cardUrl: media.sizes?.card?.url ?? null,
+        detailUrl: media.sizes?.detail?.url ?? null,
+        detailWidth: media.sizes?.detail?.width ?? media.width ?? null,
+        detailHeight: media.sizes?.detail?.height ?? media.height ?? null,
+      }
+    : null
 }
 function toPublicEvent(doc: any): PublicEvent {
   return { id: String(doc.id), title: doc.title, slug: doc.slug, summary: doc.summary, body: doc.body, location: doc.location ?? null, startsAt: doc.startsAt, endsAt: doc.endsAt, publishedAt: doc.publishedAt, status: doc.status as 'published' | 'archived', heroImage: toEventImage(doc.heroImage), galleryImages: (doc.galleryImages ?? []).map(toEventImage).filter((image: ReturnType<typeof toEventImage>) => image !== null) }

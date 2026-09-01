@@ -10,7 +10,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: event.title,
     description: event.summary,
-    openGraph: { title: event.title, description: event.summary, images: event.fullImage ? [event.fullImage.url] : undefined },
+    openGraph: {
+      title: event.title,
+      description: event.summary,
+      images: event.fullImage
+        ? [{ url: event.fullImage.url, ...(event.fullImage.width && event.fullImage.height ? { width: event.fullImage.width, height: event.fullImage.height } : {}) }]
+        : undefined,
+    },
   }
 }
 
