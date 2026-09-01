@@ -1,5 +1,7 @@
 import { createPublicKey, verify } from 'node:crypto'
 import { NextRequest, NextResponse } from 'next/server'
+import { getPayload } from 'payload'
+import config from '@payload-config'
 import { fetchBlobStorageUsage } from '../../../../lib/integrations/vercelUsage'
 
 const InteractionType = { PING: 1, APPLICATION_COMMAND: 2 } as const
@@ -41,7 +43,36 @@ export async function POST(request: NextRequest) {
     })
   }
 
+  if (interaction.type === InteractionType.APPLICATION_COMMAND && interaction.data?.name === 'newevent') {
+    return NextResponse.json({
+      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      data: { content: await createDraftEvent(interaction), flags: EPHEMERAL_FLAG },
+    })
+  }
+
   return NextResponse.json({ error: 'unknown interaction' }, { status: 400 })
+}
+
+// サーバー内での実行(interaction.member)・DMでの実行(interaction.user)の両方をサポートする。
+async function createDraftEvent(interaction: any): Promise<string> {
+  const title = String(interaction.data?.options?.find((opt: any) => opt.name === 'name')?.value ?? '').trim()
+  if (!title) return 'イベント名を指定してください。'
+
+  const discordUser = interaction.member?.user ?? interaction.user
+  const payload = await getPayload({ config })
+
+  try {
+    const doc = await payload.create({
+      collection: 'events',
+      data: { title, summary: `「${title}」の下書きがDiscordから作成されました`, createdByDiscordId: discordUser?.id, createdByUsername: discordUser?.username },
+      draft: true,
+      overrideAccess: true,
+    })
+    const editUrl = `${process.env.NEXT_PUBLIC_APP_URL}/admin/collections/events/${doc.id}`
+    return `✅ 「${doc.title}」を下書きとして作成しました\n${editUrl}`
+  } catch (error) {
+    return `イベントの作成に失敗しました: ${error instanceof Error ? error.message : String(error)}`
+  }
 }
 
 async function buildUsageMessage(): Promise<string> {
