@@ -91,8 +91,12 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    vercelUsageMonitor: VercelUsageMonitor;
+  };
+  globalsSelect: {
+    vercelUsageMonitor: VercelUsageMonitorSelect<false> | VercelUsageMonitorSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -476,6 +480,28 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vercelUsageMonitor".
+ */
+export interface VercelUsageMonitor {
+  id: number;
+  periodKey?: string | null;
+  notifiedThreshold?: number | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vercelUsageMonitor_select".
+ */
+export interface VercelUsageMonitorSelect<T extends boolean = true> {
+  periodKey?: T;
+  notifiedThreshold?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

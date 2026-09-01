@@ -8,6 +8,7 @@ import * as migration_20260830_010000_events_created_by_discord from './20260830
 import * as migration_20260830_020000_events_created_by_username from './20260830_020000_events_created_by_username';
 import * as migration_20260830_030000_events_location_and_review_requester from './20260830_030000_events_location_and_review_requester';
 import * as migration_20260830_040000_events_deleted_at from './20260830_040000_events_deleted_at';
+import * as migration_20260901_011906_vercel_usage_monitor from './20260901_011906_vercel_usage_monitor';
 
 export const migrations = [
   {
@@ -59,5 +60,10 @@ export const migrations = [
     up: migration_20260830_040000_events_deleted_at.up,
     down: migration_20260830_040000_events_deleted_at.down,
     name: '20260830_040000_events_deleted_at'
+  },
+  {
+    up: migration_20260901_011906_vercel_usage_monitor.up,
+    down: migration_20260901_011906_vercel_usage_monitor.down,
+    name: '20260901_011906_vercel_usage_monitor'
   },
 ];

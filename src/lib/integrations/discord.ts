@@ -49,3 +49,10 @@ export async function notifyPublished(input: { eventTitle: string; summary: stri
 export async function notifyArchived(input: { eventTitle: string; actor: string }) {
   return sendReviewWebhook(`アーカイブ: **${input.eventTitle}**\n実行者: ${input.actor}`)
 }
+
+export async function notifyVercelUsageThreshold(input: { resource: string; percent: number; usedGb: number; limitGb: number }) {
+  return sendReviewWebhook(`
+      @here\n### ⚠️ ${input.resource}の使用量が無料枠の${Math.round(input.percent)}%を超えました
+      > ${input.usedGb.toFixed(2)}GB / ${input.limitGb.toFixed(2)}GB
+    `)
+}

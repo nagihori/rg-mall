@@ -9,6 +9,10 @@ export const Media: CollectionConfig = {
   },
   upload: {
     mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+    // ゲームのスクリーンショット等、選択直後は数十MBになりうるファイルをVercel Functionsの
+    // ボディサイズ上限(413)にかかる前にブラウザ側で縮小する。サーバー側の下記resizeOptions/
+    // formatOptionsは、この事前リサイズをすり抜けた場合の二重の安全策として残す。
+    admin: { components: { controls: ['./src/cms/components/AutoResizeUploadControl.tsx'] } },
     // 原本は長辺1600pxまでに縮小してBlobに保存(無料枠のストレージ・帯域を圧迫しないように)。
     // 詳細ページでの「拡大」表示にはこの原本(1600px)をそのまま使う想定。
     resizeOptions: { width: 1600, height: 1600, fit: 'inside', withoutEnlargement: true },

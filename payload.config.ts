@@ -11,6 +11,7 @@ import { Events } from './src/cms/collections/events'
 import { Users } from './src/cms/collections/users'
 import { Media } from './src/cms/collections/media'
 import { AuditLogs } from './src/cms/collections/auditLogs'
+import { VercelUsageMonitor } from './src/cms/globals/vercelUsageMonitor'
 
 const databaseURL = process.env.DATABASE_URL
 const configDir = dirname(fileURLToPath(import.meta.url))
@@ -48,6 +49,7 @@ export default buildConfig({
   editor: lexicalEditor(),
   sharp,
   collections: [Users, Events, Media, AuditLogs],
+  globals: [VercelUsageMonitor],
   plugins: [
     vercelBlobStorage({
       collections: {

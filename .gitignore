@@ -5,3 +5,6 @@ coverage/
 .env.local
 .env*.local
 .vercel
+
+.DS_Store
+desktop.ini
