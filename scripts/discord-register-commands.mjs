@@ -16,7 +16,7 @@ const commands = [
   {
     name: 'newevent',
     description: '新しいイベントを下書きとして作成します',
-    options: [{ name: 'name', description: 'イベント名', type: 3, required: true }],
+    options: [{ name: 'title', description: 'イベント名', type: 3, required: true }],
   },
 ]
 

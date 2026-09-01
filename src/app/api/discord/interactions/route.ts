@@ -1,11 +1,11 @@
 import { createPublicKey, verify } from 'node:crypto'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { fetchBlobStorageUsage } from '../../../../lib/integrations/vercelUsage'
 
 const InteractionType = { PING: 1, APPLICATION_COMMAND: 2 } as const
-const InteractionResponseType = { PONG: 1, CHANNEL_MESSAGE_WITH_SOURCE: 4 } as const
+const InteractionResponseType = { PONG: 1, CHANNEL_MESSAGE_WITH_SOURCE: 4, DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: 5 } as const
 const EPHEMERAL_FLAG = 1 << 6
 
 function verifyDiscordSignature(publicKeyHex: string, signatureHex: string, timestamp: string, body: string): boolean {
@@ -44,24 +44,39 @@ export async function POST(request: NextRequest) {
   }
 
   if (interaction.type === InteractionType.APPLICATION_COMMAND && interaction.data?.name === 'newevent') {
+    // payload.createはDBコールドスタート込みでDiscordの3秒応答制限を超えることがあるため、
+    // 先にDEFERRED応答で確保しておき、本処理はafter()でレスポンス返却後に実行してフォローアップメッセージを編集する。
+    after(() => createDraftEvent(interaction))
     return NextResponse.json({
-      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-      data: { content: await createDraftEvent(interaction), flags: EPHEMERAL_FLAG },
+      type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
+      data: { flags: EPHEMERAL_FLAG },
     })
   }
 
   return NextResponse.json({ error: 'unknown interaction' }, { status: 400 })
 }
 
+async function editFollowupMessage(interaction: any, content: string) {
+  const url = `https://discord.com/api/v10/webhooks/${interaction.application_id}/${interaction.token}/messages/@original`
+  await fetch(url, {
+    method: 'PATCH',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ content }),
+  })
+}
+
 // サーバー内での実行(interaction.member)・DMでの実行(interaction.user)の両方をサポートする。
-async function createDraftEvent(interaction: any): Promise<string> {
-  const title = String(interaction.data?.options?.find((opt: any) => opt.name === 'name')?.value ?? '').trim()
-  if (!title) return 'イベント名を指定してください。'
+async function createDraftEvent(interaction: any): Promise<void> {
+  const title = String(interaction.data?.options?.find((opt: any) => opt.name === 'title')?.value ?? '').trim()
+  if (!title) {
+    await editFollowupMessage(interaction, 'イベント名を指定してください。')
+    return
+  }
 
   const discordUser = interaction.member?.user ?? interaction.user
-  const payload = await getPayload({ config })
 
   try {
+    const payload = await getPayload({ config })
     const doc = await payload.create({
       collection: 'events',
       data: { title, summary: `「${title}」の下書きがDiscordから作成されました`, createdByDiscordId: discordUser?.id, createdByUsername: discordUser?.username },
@@ -69,9 +84,9 @@ async function createDraftEvent(interaction: any): Promise<string> {
       overrideAccess: true,
     })
     const editUrl = `${process.env.NEXT_PUBLIC_APP_URL}/admin/collections/events/${doc.id}`
-    return `✅ 「${doc.title}」を下書きとして作成しました\n${editUrl}`
+    await editFollowupMessage(interaction, `✅ 「${doc.title}」を下書きとして作成しました\n${editUrl}`)
   } catch (error) {
-    return `イベントの作成に失敗しました: ${error instanceof Error ? error.message : String(error)}`
+    await editFollowupMessage(interaction, `イベントの作成に失敗しました: ${error instanceof Error ? error.message : String(error)}`)
   }
 }
 
