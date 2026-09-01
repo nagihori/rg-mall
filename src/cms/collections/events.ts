@@ -82,6 +82,10 @@ export const Events: CollectionConfig = {
         } else if (doc.status === 'published') {
           const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL}/events/${doc.slug}`
           const author = doc.createdByUsername ?? requester
+          // Discordが通知内リンクを踏んだ直後にOGPを取りに来た際、その回だけコールドスタート等で
+          // レンダリングが遅れて空メタのまま結果がキャッシュされてしまうことがある。
+          // 通知を送る前に一度サーバー側から実URLを叩いて温めておく(失敗してもベストエフォート)。
+          await fetch(publicUrl).catch(() => null)
           await notifyPublished({ eventTitle: doc.title, requester: author, summary: doc.summary, publicUrl })
         } else if (doc.status === 'archived' && previousDoc?.status === 'published') {
           // 開催終了による自動アーカイブ(cron)はreq.userを持たないため、実行者名を分けて表示する。
