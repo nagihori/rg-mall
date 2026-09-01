@@ -11,7 +11,14 @@ if (!applicationId || !botToken) {
   throw new Error('DISCORD_CLIENT_ID and DISCORD_BOT_TOKEN must be set to register commands.')
 }
 
-const commands = [{ name: 'tccheck', description: 'Vercelの無料枠使用量(Blob Storage)を確認します' }]
+const commands = [
+  { name: 'tccheck', description: 'Vercelの無料枠使用量(Blob Storage)を確認します' },
+  {
+    name: 'newevent',
+    description: '新しいイベントを下書きとして作成します',
+    options: [{ name: 'name', description: 'イベント名', type: 3, required: true }],
+  },
+]
 
 const response = await fetch(`https://discord.com/api/v10/applications/${applicationId}/commands`, {
   method: 'PUT',
