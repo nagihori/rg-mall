@@ -1,10 +1,10 @@
 import { classifyEvent, type EventCategory, type EventStatus } from '@/lib/domain/events'
 
-type EventImage = { url: string; alt: string; thumbnailUrl?: string | null; cardUrl?: string | null; detailUrl?: string | null }
+type EventImage = { url: string; alt: string; thumbnailUrl?: string | null; cardUrl?: string | null; detailUrl?: string | null; detailWidth?: number | null; detailHeight?: number | null }
 export type PublicEvent = { id: string; title: string; slug: string; summary: string; body: unknown; location?: string | null; startsAt?: string | null; endsAt?: string | null; publishedAt?: string | null; status: EventStatus; heroImage?: EventImage | null; galleryImages?: EventImage[] }
 export type EventCardViewModel = { title: string; href: string; summary: string; category: EventCategory; period: string; shortDate: string | null; image: { url: string; alt: string } | null }
 export type GalleryImageViewModel = { url: string; alt: string; zoomUrl: string }
-export type EventDetailViewModel = EventCardViewModel & { body: unknown; fullImage: { url: string; alt: string; zoomUrl: string } | null; location: string | null; gallery: GalleryImageViewModel[] }
+export type EventDetailViewModel = EventCardViewModel & { body: unknown; fullImage: { url: string; alt: string; zoomUrl: string; width: number | null; height: number | null } | null; location: string | null; gallery: GalleryImageViewModel[] }
 const dateFmt = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit' })
 const timeFmt = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit', hour12: false })
 // トップページのおすすめ枠の日付バッジ用。期間表記(period)より短い「YYYY.MM.DD」だけの表記。
@@ -30,7 +30,7 @@ function buildCard(event: PublicEvent, category: EventCategory): EventCardViewMo
 }
 function buildDetail(event: PublicEvent, card: EventCardViewModel): EventDetailViewModel {
   // 通常表示はdetailサイズ(1280px程度)、拡大用に原本(1600px)のURLも別途持たせる
-  const fullImage = event.heroImage ? { url: event.heroImage.detailUrl ?? event.heroImage.cardUrl ?? event.heroImage.url, alt: event.heroImage.alt, zoomUrl: event.heroImage.url } : null
+  const fullImage = event.heroImage ? { url: event.heroImage.detailUrl ?? event.heroImage.cardUrl ?? event.heroImage.url, alt: event.heroImage.alt, zoomUrl: event.heroImage.url, width: event.heroImage.detailUrl ? (event.heroImage.detailWidth ?? null) : null, height: event.heroImage.detailUrl ? (event.heroImage.detailHeight ?? null) : null } : null
   // ギャラリーの並びはcard(縮小)サムネイルで並べ、クリックで原本を新規タブ表示する
   const gallery = (event.galleryImages ?? []).map((image) => ({ url: image.cardUrl ?? image.thumbnailUrl ?? image.url, alt: image.alt, zoomUrl: image.url }))
   return { ...card, body: event.body, fullImage, location: event.location ?? null, gallery }

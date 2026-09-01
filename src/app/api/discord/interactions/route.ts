@@ -84,7 +84,7 @@ async function createDraftEvent(interaction: any): Promise<void> {
       overrideAccess: true,
     })
     const editUrl = `${process.env.NEXT_PUBLIC_APP_URL}/admin/collections/events/${doc.id}`
-    await editFollowupMessage(interaction, `✅ 「${doc.title}」を下書きとして作成しました\n${editUrl}`)
+    await editFollowupMessage(interaction, `✅ 「 [${doc.title}](${editUrl}) 」を下書きとして作成しました`)
   } catch (error) {
     await editFollowupMessage(interaction, `イベントの作成に失敗しました: ${error instanceof Error ? error.message : String(error)}`)
   }
