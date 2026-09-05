@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     users: User;
     events: Event;
+    stores: Store;
     media: Media;
     auditLogs: AuditLog;
     'payload-kv': PayloadKv;
@@ -80,6 +81,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
+    stores: StoresSelect<false> | StoresSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     auditLogs: AuditLogsSelect<false> | AuditLogsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -243,6 +245,75 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stores".
+ */
+export interface Store {
+  id: number;
+  name: string;
+  /**
+   * 例: カフェ併設文具店（一覧のメイン画像に重ねて表示、詳細ページでは店舗名の上に表示）
+   */
+  tagline?: string | null;
+  /**
+   * 店舗詳細ページ上部に横長で表示される看板画像
+   */
+  coverImage?: (number | null) | Media;
+  /**
+   * 概要文の隣に正方形で表示されるメイン画像
+   */
+  mainImage?: (number | null) | Media;
+  /**
+   * 一覧に表示される紹介文（160文字以内）
+   */
+  summary: string;
+  owner: string;
+  avatar?: (number | null) | Media;
+  ownerLodestoneEnabled?: boolean | null;
+  /**
+   * 例: https://jp.finalfantasyxiv.com/lodestone/character/12345678/ または 12345678（別タブで開きます）
+   */
+  ownerLodestoneUrl?: string | null;
+  /**
+   * 例: 毎週土曜 21:00〜24:00（自由入力）
+   */
+  businessHours?: string | null;
+  /**
+   * X(Twitter)やDiscordなど、店舗のSNS等へのリンクを複数登録できます
+   */
+  snsLinks?:
+    | {
+        /**
+         * 例: X (Twitter)
+         */
+        label?: string | null;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  galleryImages?: (number | Media)[] | null;
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "auditLogs".
  */
 export interface AuditLog {
@@ -286,6 +357,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'events';
         value: number | Event;
+      } | null)
+    | ({
+        relationTo: 'stores';
+        value: number | Store;
       } | null)
     | ({
         relationTo: 'media';
@@ -369,6 +444,36 @@ export interface EventsSelect<T extends boolean = true> {
   createdByUsername?: T;
   reviewRequestedByDiscordId?: T;
   reviewRequestedByUsername?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stores_select".
+ */
+export interface StoresSelect<T extends boolean = true> {
+  name?: T;
+  tagline?: T;
+  coverImage?: T;
+  mainImage?: T;
+  summary?: T;
+  owner?: T;
+  avatar?: T;
+  ownerLodestoneEnabled?: T;
+  ownerLodestoneUrl?: T;
+  businessHours?: T;
+  snsLinks?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        id?: T;
+      };
+  body?: T;
+  galleryImages?: T;
+  slug?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;

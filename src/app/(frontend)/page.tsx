@@ -3,14 +3,16 @@ import type { Metadata } from 'next'
 import { FeaturedHero } from '@/components/FeaturedHero'
 import { FeaturedCompact } from '@/components/FeaturedCompact'
 import { PastEventCard } from '@/components/PastEventCard'
+import { StoreMiniCard } from '@/components/StoreMiniCard'
 import { getPublicEvents } from '@/lib/repositories/events'
+import { getPublicStores } from '@/lib/repositories/stores'
 // CMS側でイベントが変更されるたびに revalidatePublicEventPaths が即時反映するため、
 // これは取りこぼし対策のフォールバックとしての秒数。
 export const revalidate = 60
 export const metadata: Metadata = { title: 'イベントのお知らせ' }
 
 export default async function HomePage() {
-  const events = await getPublicEvents()
+  const [events, stores] = await Promise.all([getPublicEvents(), getPublicStores()])
   // 開催中・開催予定・新着をまとめて「注目のイベント」枠として扱う(2ヶ月に一度もイベントがない想定のため、
   // 単純に開催中/開催予定だけだと枠が空になりやすい)。先頭1件を大きく、続く最大3件を一覧で見せる。
   const live = events.filter((e) => e.category === 'ongoing' || e.category === 'upcoming' || e.category === 'new')
@@ -39,6 +41,14 @@ export default async function HomePage() {
           <Link href="/archive" className="more-link">＞ もっと前のイベントを見る</Link>
           <div className="grid">
             {past.map((event) => <PastEventCard key={event.href} event={event} />)}
+          </div>
+        </section>
+      )}
+      {stores.length > 0 && (
+        <section id="stores" className="store-preview-section">
+          <h2>所属店舗</h2>
+          <div className="store-mini-grid">
+            {stores.map((store) => <StoreMiniCard key={store.href} store={store} />)}
           </div>
         </section>
       )}

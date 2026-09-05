@@ -9,6 +9,9 @@ import * as migration_20260830_020000_events_created_by_username from './2026083
 import * as migration_20260830_030000_events_location_and_review_requester from './20260830_030000_events_location_and_review_requester';
 import * as migration_20260830_040000_events_deleted_at from './20260830_040000_events_deleted_at';
 import * as migration_20260901_011906_vercel_usage_monitor from './20260901_011906_vercel_usage_monitor';
+import * as migration_20260905_121651_stores_collection from './20260905_121651_stores_collection';
+import * as migration_20260905_124347_stores_main_image from './20260905_124347_stores_main_image';
+import * as migration_20260905_131900_stores_tagline from './20260905_131900_stores_tagline';
 
 export const migrations = [
   {
@@ -24,46 +27,61 @@ export const migrations = [
   {
     up: migration_20260829_132633_media_upload.up,
     down: migration_20260829_132633_media_upload.down,
-    name: '20260829_132633_media_upload'
+    name: '20260829_132633_media_upload',
   },
   {
     up: migration_20260829_135500_media_rights_uploader.up,
     down: migration_20260829_135500_media_rights_uploader.down,
-    name: '20260829_135500_media_rights_uploader'
+    name: '20260829_135500_media_rights_uploader',
   },
   {
     up: migration_20260829_141200_media_drop_storage_key.up,
     down: migration_20260829_141200_media_drop_storage_key.down,
-    name: '20260829_141200_media_drop_storage_key'
+    name: '20260829_141200_media_drop_storage_key',
   },
   {
     up: migration_20260830_000000_media_sizes.up,
     down: migration_20260830_000000_media_sizes.down,
-    name: '20260830_000000_media_sizes'
+    name: '20260830_000000_media_sizes',
   },
   {
     up: migration_20260830_010000_events_created_by_discord.up,
     down: migration_20260830_010000_events_created_by_discord.down,
-    name: '20260830_010000_events_created_by_discord'
+    name: '20260830_010000_events_created_by_discord',
   },
   {
     up: migration_20260830_020000_events_created_by_username.up,
     down: migration_20260830_020000_events_created_by_username.down,
-    name: '20260830_020000_events_created_by_username'
+    name: '20260830_020000_events_created_by_username',
   },
   {
     up: migration_20260830_030000_events_location_and_review_requester.up,
     down: migration_20260830_030000_events_location_and_review_requester.down,
-    name: '20260830_030000_events_location_and_review_requester'
+    name: '20260830_030000_events_location_and_review_requester',
   },
   {
     up: migration_20260830_040000_events_deleted_at.up,
     down: migration_20260830_040000_events_deleted_at.down,
-    name: '20260830_040000_events_deleted_at'
+    name: '20260830_040000_events_deleted_at',
   },
   {
     up: migration_20260901_011906_vercel_usage_monitor.up,
     down: migration_20260901_011906_vercel_usage_monitor.down,
-    name: '20260901_011906_vercel_usage_monitor'
+    name: '20260901_011906_vercel_usage_monitor',
+  },
+  {
+    up: migration_20260905_121651_stores_collection.up,
+    down: migration_20260905_121651_stores_collection.down,
+    name: '20260905_121651_stores_collection',
+  },
+  {
+    up: migration_20260905_124347_stores_main_image.up,
+    down: migration_20260905_124347_stores_main_image.down,
+    name: '20260905_124347_stores_main_image',
+  },
+  {
+    up: migration_20260905_131900_stores_tagline.up,
+    down: migration_20260905_131900_stores_tagline.down,
+    name: '20260905_131900_stores_tagline'
   },
 ];
