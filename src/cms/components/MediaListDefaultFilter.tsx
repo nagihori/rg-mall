@@ -14,6 +14,12 @@ export const MediaListDefaultFilter: React.FC = () => {
 
   useEffect(() => {
     if (!user) return
+    // このコンポーネントは本文(richText)のアップロード/リレーション選択ドロワーの中身としても描画される。
+    // ドロワーは別ルートではなく現在のページに被さるオーバーレイなので、usePathnameは裏にある
+    // 元ページ(例: /admin/collections/events/create)のパスを返す。ガードせずrouter.replaceすると
+    // 新規作成中のページ自体のURLが書き換わり、force-dynamicなサーバーコンポーネントが再取得されて
+    // フォーム全体が初期状態に巻き戻り、未保存の入力(タイトル等)が消えてしまう。
+    if (document.querySelector('[id^="doc-drawer_"], [id^="list-drawer_"]')) return
     const hasWhere = [...searchParams.keys()].some((key) => key.startsWith('where'))
     if (hasWhere) return
     const params = new URLSearchParams(searchParams)
