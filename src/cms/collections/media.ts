@@ -5,7 +5,10 @@ export const Media: CollectionConfig = {
   slug: 'media', labels: { singular: 'メディア', plural: 'メディア' }, access: { read: canEdit, create: canEdit, update: canEdit, delete: isAdmin },
   admin: {
     defaultColumns: ['filename', 'alt', 'uploadedBy', 'updatedAt'],
-    components: { beforeList: ['./src/cms/components/MediaListDefaultFilter.tsx'] },
+    components: {
+      beforeList: ['./src/cms/components/MediaListDefaultFilter.tsx'],
+      edit: { SaveButton: './src/cms/components/AutoCloseMediaDrawerButton.tsx' },
+    },
   },
   upload: {
     mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
