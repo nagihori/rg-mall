@@ -3,6 +3,10 @@
 * { box-sizing: border-box; }
 
 html { overflow-x: hidden; }
+/* ヘッダーの「所属店舗を見る」等、ページ内アンカーへの移動をなめらかにする */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
 body {
   margin: 0;
   /* 100vwへのフルブリード(.event-hero等)はスクロールバー幅の分だけはみ出しうるため、横スクロールを明示的に止める */
@@ -45,6 +49,7 @@ section { margin-block: var(--space-4); }
   line-height: 1.8;
   text-align: center;
 }
+.site-header .more-link { margin-top: var(--space-1); font-size: var(--text-sm); }
 
 /* ページ固有の見出し(archive・event詳細・イベント一覧) */
 main > h1 {
@@ -157,6 +162,28 @@ section > h2::before { content: ''; position: absolute; left: 0; top: .15em; bot
 .past-card-thumb img { display: block; width: 100%; aspect-ratio: var(--thumb-ratio); object-fit: cover; margin: 0; border-radius: 0; }
 .past-card > p { margin: 0; color: var(--color-muted); font-size: var(--text-sm); }
 
+/* --- トップページの所属店舗紹介枠(控えめな小さいカード) --- */
+/* gridでauto-fitすると1件だけの時に幅いっぱいへ伸びてしまうため、flexで中央寄せしつつ自然な幅で並べる */
+.store-mini-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-3); margin-top: var(--space-2); }
+/* /storesの.cardと同じ白背景+枠+影のカード表面に、画像とテキストを乗せる */
+.store-mini-card {
+  flex: 0 1 16rem; display: flex; flex-direction: column;
+  background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-sm); box-shadow: var(--shadow-card);
+  padding: var(--space-2); text-decoration: none; color: var(--color-ink); text-align: center;
+}
+.store-mini-thumb { position: relative; margin: 0 0 var(--space-1); overflow: hidden; border-radius: var(--radius-sm); }
+.store-mini-thumb img { display: block; width: 100%; aspect-ratio: var(--thumb-ratio); object-fit: cover; margin: 0; }
+/* タグラインはメイン画像の左上に重ねる小さな札(店先の値札のイメージ) */
+.store-mini-tagline {
+  position: absolute; top: .5em; left: .5em; max-width: calc(100% - 1em);
+  padding: .25em .6em; background: var(--color-iron); color: var(--color-gold-soft);
+  font-size: var(--text-xs); letter-spacing: .04em; border-radius: 2px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.store-mini-card p { margin: 0; font-size: var(--text-sm); }
+.store-mini-card .store-mini-owner { margin-top: .15em; color: var(--color-muted); font-size: var(--text-xs); }
+.store-mini-card:hover p { color: var(--color-gold); }
+
 /* --- イベント詳細ページ(共通ヘッダー/フッターを外した独立ページ) --- */
 .event-page { max-width: 44rem; margin: 0 auto; padding: 0 var(--space-2) var(--space-4); }
 /* 戻り導線だけの細い帯。ヒーローの上に独立したコンポーネントとして乗せる */
@@ -183,7 +210,8 @@ section > h2::before { content: ''; position: absolute; left: 0; top: .15em; bot
 
 .event-info { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-4); }
 .event-info-media { display: block; flex: 1 1 20rem; max-width: 28rem; overflow: hidden; background: none; padding: 0; border: 1px solid var(--color-border); border-radius: var(--radius-sm); box-shadow: var(--shadow-card); cursor: zoom-in; }
-.event-info-media img { display: block; width: 100%; aspect-ratio: var(--thumb-ratio); object-fit: cover; margin: 0; border-radius: 0; }
+/* メイン画像は切り抜かず全体を見せたいので、枠の縦横比を強制せず画像自身の比率のまま表示する */
+.event-info-media img { display: block; width: 100%; height: auto; margin: 0; border-radius: 0; }
 .event-info-meta { flex: 1 1 14rem; }
 .event-info-meta > p { margin: 0 0 var(--space-2); }
 .event-info-meta dl { margin: 0; }
@@ -213,6 +241,43 @@ section > h2::before { content: ''; position: absolute; left: 0; top: .15em; bot
 .gallery-item:hover img { transform: scale(1.05); }
 
 .back-link { display: inline-block; margin-block: var(--space-3); font-size: var(--text-sm); }
+
+/* --- 店舗詳細ページ --- */
+.store-page { max-width: 44rem; margin: 0 auto; padding-bottom: var(--space-4); }
+/* カバー画像だけ100vwにフルブリードする(イベント詳細のヒーローと同じ考え方だが、こちらは文字を重ねない素の写真) */
+/* imgに直接100vwを当てると全体共通のimg{max-width:100%}に打ち消されるため、コンテナ側でフルブリード幅を確保し、
+   画像はabsolute+inset:0で敷き詰める(event-heroと同じ構成)。 */
+/* 看板画像は幅に関わらず一定の低い高さで容赦なく上下トリミングする(横幅が狭くなっても印象を変えないため固定pxにする) */
+.store-cover { position: relative; overflow: hidden; width: 100vw; margin: 0 calc(50% - 50vw) var(--space-3); height: 180px; background: var(--color-border); }
+.store-cover img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: center center; margin: 0; border-radius: 0; }
+.store-body { padding: 0 var(--space-2); }
+/* タグラインは店舗名(text-xl)のちょうど半分のサイズで、店舗名の直上に添える */
+.store-tagline { margin: 0; color: var(--color-muted); font-size: calc(var(--text-xl) / 2); letter-spacing: .04em; }
+.store-title { margin: 0 0 var(--space-3); font-family: var(--font-display); font-size: var(--text-xl); color: var(--color-ink); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-1); }
+.store-layout { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-4); }
+.store-media { display: block; flex: 1 1 16rem; max-width: 20rem; overflow: hidden; background: none; padding: 0; border: 1px solid var(--color-border); border-radius: var(--radius-sm); box-shadow: var(--shadow-card); cursor: zoom-in; }
+/* メイン画像は切り抜かず全体を見せたいので、枠の縦横比を強制せず画像自身の比率のまま表示する */
+.store-media img { display: block; width: 100%; height: auto; margin: 0; border-radius: 0; }
+.store-meta { flex: 1 1 16rem; }
+.store-meta > p { margin: 0 0 var(--space-2); }
+.store-meta dl { margin: 0; }
+.store-meta dt { margin-top: var(--space-2); color: var(--color-muted); font-size: var(--text-xs); letter-spacing: .08em; text-transform: uppercase; }
+.store-meta dt:first-child { margin-top: 0; }
+.store-meta dd { margin: .15em 0 0; }
+/* --- オーナー表示(アバター+名前+Lodestoneリンク) --- */
+.store-owner { display: flex; align-items: center; gap: .5em; }
+.store-owner-avatar { width: 2.75rem; height: 2.75rem; object-fit: cover; border-radius: 50%; margin: 0; border: 1px solid var(--color-border); }
+.lodestone-link { display: inline-flex; color: var(--color-muted); }
+.lodestone-link:hover { color: var(--color-gold); }
+
+/* --- 店舗詳細のSNSリンク --- */
+.sns-links { display: flex; flex-wrap: wrap; gap: .5em; margin-top: .3em; }
+.sns-link {
+  display: inline-flex; align-items: center; gap: .3em;
+  padding: .3em .9em; border: 1px solid var(--color-gold-soft); border-radius: 999px;
+  color: var(--color-ink); font-size: var(--text-sm); text-decoration: none;
+}
+.sns-link:hover { border-color: var(--color-gold); color: var(--color-gold); }
 
 .prose { max-width: 48rem; line-height: 1.85; }
 .prose h1 { font-family: var(--font-display); font-size: var(--text-xl); }

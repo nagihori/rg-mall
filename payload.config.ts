@@ -8,6 +8,7 @@ import sharp from 'sharp'
 import { en } from '@payloadcms/translations/languages/en'
 import { ja } from '@payloadcms/translations/languages/ja'
 import { Events } from './src/cms/collections/events'
+import { Stores } from './src/cms/collections/stores'
 import { Users } from './src/cms/collections/users'
 import { Media } from './src/cms/collections/media'
 import { AuditLogs } from './src/cms/collections/auditLogs'
@@ -48,7 +49,7 @@ export default buildConfig({
   },
   editor: lexicalEditor(),
   sharp,
-  collections: [Users, Events, Media, AuditLogs],
+  collections: [Users, Events, Stores, Media, AuditLogs],
   globals: [VercelUsageMonitor],
   plugins: [
     vercelBlobStorage({
