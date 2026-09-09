@@ -65,6 +65,14 @@ export const Stores: CollectionConfig = {
     },
     { name: 'businessHours', type: 'text', label: '基本営業時間', maxLength: 120, admin: { description: '例: 毎週土曜 21:00〜24:00（自由入力）' } },
     {
+      name: 'scheduleDates', type: 'array', label: '営業予定日', labels: { singular: '予定日', plural: '予定日' },
+      admin: { description: '月に1〜2件程度を想定。店舗ページと、トップページの「商店街スケジュール」カレンダーに表示されます。' },
+      fields: [
+        { name: 'date', type: 'date', label: '日付', required: true, admin: { date: { pickerAppearance: 'dayOnly', displayFormat: 'yyyy/MM/dd' } } },
+        { name: 'note', type: 'text', label: 'メモ', maxLength: 40, admin: { description: '例: 限定メニューあり（任意・カレンダー上にも表示されます）' } },
+      ],
+    },
+    {
       name: 'snsLinks', type: 'array', label: 'SNSリンク', labels: { singular: 'リンク', plural: 'リンク' },
       admin: { description: 'X(Twitter)やDiscordなど、店舗のSNS等へのリンクを複数登録できます' },
       fields: [

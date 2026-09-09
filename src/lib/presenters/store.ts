@@ -1,13 +1,18 @@
+import { toDateKey, type MallCalendarEntry } from '@/lib/domain/mallCalendar'
+
 type StoreImage = { url: string; alt: string; thumbnailUrl?: string | null; cardUrl?: string | null; detailUrl?: string | null }
 type SnsLink = { label?: string | null; url: string }
+type ScheduleDate = { date: string; note?: string | null }
 export type PublicStore = {
   id: string; name: string; slug: string; tagline?: string | null; owner: string; summary: string; businessHours?: string | null; body: unknown
   avatar?: StoreImage | null; coverImage?: StoreImage | null; mainImage?: StoreImage | null; galleryImages?: StoreImage[]
   ownerLodestoneEnabled?: boolean | null; ownerLodestoneUrl?: string | null
   snsLinks?: SnsLink[] | null
+  scheduleDates?: ScheduleDate[] | null
 }
 export type StoreCardViewModel = { name: string; tagline: string | null; href: string; owner: string; summary: string; image: { url: string; alt: string } | null }
 export type GalleryImageViewModel = { url: string; alt: string; zoomUrl: string }
+export type ScheduleDateViewModel = { dateKey: string; label: string; note: string | null }
 export type StoreDetailViewModel = StoreCardViewModel & {
   body: unknown; businessHours: string | null
   avatar: { url: string; alt: string } | null
@@ -16,6 +21,22 @@ export type StoreDetailViewModel = StoreCardViewModel & {
   gallery: GalleryImageViewModel[]
   ownerLodestoneUrl: string | null
   snsLinks: SnsLink[]
+  scheduleDates: ScheduleDateViewModel[]
+}
+const scheduleDateFmt = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit' })
+const scheduleWeekdayFmt = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', weekday: 'short' })
+function formatScheduleLabel(value: string): string {
+  const d = new Date(value)
+  return `${scheduleDateFmt.format(d).replaceAll('/', '.')}(${scheduleWeekdayFmt.format(d)})`
+}
+// 店舗ページには「これから」の予定日だけを、日付の早い順で表示する(終わった予定を出し続けても意味がないため)。
+export function buildUpcomingScheduleDates(scheduleDates: ScheduleDate[] | null | undefined, now = new Date()): ScheduleDateViewModel[] {
+  const todayKey = toDateKey(now)
+  return (scheduleDates ?? [])
+    .filter((entry) => Boolean(entry.date))
+    .map((entry) => ({ dateKey: toDateKey(entry.date), label: formatScheduleLabel(entry.date), note: entry.note ?? null }))
+    .filter((entry) => entry.dateKey >= todayKey)
+    .sort((a, b) => a.dateKey.localeCompare(b.dateKey))
 }
 
 function buildCard(store: PublicStore): StoreCardViewModel {
@@ -41,5 +62,16 @@ export function presentStoreDetail(store: PublicStore): StoreDetailViewModel {
     ...card, body: store.body, businessHours: store.businessHours ?? null, avatar, cover, media, gallery,
     ownerLodestoneUrl: store.ownerLodestoneEnabled ? (store.ownerLodestoneUrl ?? null) : null,
     snsLinks: (store.snsLinks ?? []).filter((link) => Boolean(link.url)),
+    scheduleDates: buildUpcomingScheduleDates(store.scheduleDates),
   }
+}
+// トップページ「商店街スケジュール」カレンダー用。全店舗の予定日をフラットな配列にまとめる(店舗ごとの絞り込みはしない)。
+export function buildMallCalendarStoreEntries(stores: Pick<PublicStore, 'name' | 'slug' | 'scheduleDates'>[], now = new Date()): MallCalendarEntry[] {
+  const todayKey = toDateKey(now)
+  return stores.flatMap((store) =>
+    (store.scheduleDates ?? [])
+      .filter((entry) => Boolean(entry.date))
+      .map((entry) => ({ dateKey: toDateKey(entry.date), label: store.name, href: `/stores/${store.slug}`, note: entry.note ?? null, kind: 'store' as const }))
+      .filter((entry) => entry.dateKey >= todayKey),
+  )
 }

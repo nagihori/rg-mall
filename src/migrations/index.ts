@@ -12,6 +12,8 @@ import * as migration_20260901_011906_vercel_usage_monitor from './20260901_0119
 import * as migration_20260905_121651_stores_collection from './20260905_121651_stores_collection';
 import * as migration_20260905_124347_stores_main_image from './20260905_124347_stores_main_image';
 import * as migration_20260905_131900_stores_tagline from './20260905_131900_stores_tagline';
+import * as migration_20260909_221240_stores_schedule_dates from './20260909_221240_stores_schedule_dates';
+import * as migration_20260909_223119_events_show_on_mall_calendar from './20260909_223119_events_show_on_mall_calendar';
 
 export const migrations = [
   {
@@ -82,6 +84,16 @@ export const migrations = [
   {
     up: migration_20260905_131900_stores_tagline.up,
     down: migration_20260905_131900_stores_tagline.down,
-    name: '20260905_131900_stores_tagline'
+    name: '20260905_131900_stores_tagline',
+  },
+  {
+    up: migration_20260909_221240_stores_schedule_dates.up,
+    down: migration_20260909_221240_stores_schedule_dates.down,
+    name: '20260909_221240_stores_schedule_dates',
+  },
+  {
+    up: migration_20260909_223119_events_show_on_mall_calendar.up,
+    down: migration_20260909_223119_events_show_on_mall_calendar.down,
+    name: '20260909_223119_events_show_on_mall_calendar'
   },
 ];

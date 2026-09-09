@@ -146,6 +146,7 @@ export const Events: CollectionConfig = {
     { name: 'startsAt', type: 'date', label: '開始日時', admin: { position: 'sidebar', ...dateTimeAdmin }, access: { update: ({ data }) => data?.status !== 'published' } },
     { name: 'endsAt', type: 'date', label: '終了日時', admin: { position: 'sidebar', ...dateTimeAdmin }, access: { update: ({ data }) => data?.status !== 'published' } },
     { name: 'location', type: 'text', label: '場所', admin: { position: 'sidebar', description: '開催場所（自由入力）' }, access: { update: ({ data }) => data?.status !== 'published' } },
+    { name: 'showOnMallCalendar', type: 'checkbox', label: 'カレンダーに表示', defaultValue: false, admin: { position: 'sidebar', description: '商店街全体のイベントとして、トップページの「商店街スケジュール」カレンダーに開始日〜終了日を表示します。' }, access: { update: ({ data }) => data?.status !== 'published' } },
     { name: 'publishedAt', type: 'date', label: '公開日時', admin: { position: 'sidebar', readOnly: true, ...dateTimeAdmin } },
     // URLに使うslugは編集者が普段意識する必要がないため、サイドバーの下の方に控えめに表示するだけにする。
     // 値はbeforeValidateフックがサーバー側で自動生成するもので編集者が入力する項目ではないため、

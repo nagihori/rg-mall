@@ -174,6 +174,10 @@ export interface Event {
    * 開催場所（自由入力）
    */
   location?: string | null;
+  /**
+   * 商店街全体のイベントとして、トップページの「商店街スケジュール」カレンダーに開始日〜終了日を表示します。
+   */
+  showOnMallCalendar?: boolean | null;
   publishedAt?: string | null;
   slug?: string | null;
   status: 'draft' | 'in_review' | 'published' | 'archived';
@@ -277,6 +281,19 @@ export interface Store {
    * 例: 毎週土曜 21:00〜24:00（自由入力）
    */
   businessHours?: string | null;
+  /**
+   * 月に1〜2件程度を想定。店舗ページと、トップページの「商店街スケジュール」カレンダーに表示されます。
+   */
+  scheduleDates?:
+    | {
+        date: string;
+        /**
+         * 例: 限定メニューあり（任意・カレンダー上にも表示されます）
+         */
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * X(Twitter)やDiscordなど、店舗のSNS等へのリンクを複数登録できます
    */
@@ -436,6 +453,7 @@ export interface EventsSelect<T extends boolean = true> {
   startsAt?: T;
   endsAt?: T;
   location?: T;
+  showOnMallCalendar?: T;
   publishedAt?: T;
   slug?: T;
   status?: T;
@@ -464,6 +482,13 @@ export interface StoresSelect<T extends boolean = true> {
   ownerLodestoneEnabled?: T;
   ownerLodestoneUrl?: T;
   businessHours?: T;
+  scheduleDates?:
+    | T
+    | {
+        date?: T;
+        note?: T;
+        id?: T;
+      };
   snsLinks?:
     | T
     | {
