@@ -14,6 +14,8 @@ import * as migration_20260905_124347_stores_main_image from './20260905_124347_
 import * as migration_20260905_131900_stores_tagline from './20260905_131900_stores_tagline';
 import * as migration_20260909_221240_stores_schedule_dates from './20260909_221240_stores_schedule_dates';
 import * as migration_20260909_223119_events_show_on_mall_calendar from './20260909_223119_events_show_on_mall_calendar';
+import * as migration_20260909_224513_site_settings_global from './20260909_224513_site_settings_global';
+import * as migration_20260909_230127_site_settings_header_footer_images from './20260909_230127_site_settings_header_footer_images';
 
 export const migrations = [
   {
@@ -94,6 +96,16 @@ export const migrations = [
   {
     up: migration_20260909_223119_events_show_on_mall_calendar.up,
     down: migration_20260909_223119_events_show_on_mall_calendar.down,
-    name: '20260909_223119_events_show_on_mall_calendar'
+    name: '20260909_223119_events_show_on_mall_calendar',
+  },
+  {
+    up: migration_20260909_224513_site_settings_global.up,
+    down: migration_20260909_224513_site_settings_global.down,
+    name: '20260909_224513_site_settings_global',
+  },
+  {
+    up: migration_20260909_230127_site_settings_header_footer_images.up,
+    down: migration_20260909_230127_site_settings_header_footer_images.down,
+    name: '20260909_230127_site_settings_header_footer_images'
   },
 ];

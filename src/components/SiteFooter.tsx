@@ -1,30 +1,51 @@
 import Image from 'next/image'
+import type { SiteSettingsViewModel } from '@/lib/repositories/siteSettings'
 
-// TODO: サーバー名・集合場所・連絡先は仮テキスト。実データが決まり次第差し替える。
-export function SiteFooter() {
+export function SiteFooter({ settings }: { settings: SiteSettingsViewModel }) {
+  const { mallName, server, location, contactText, contactLinkUrl, recruitingText, recruitingUrl, footerImageUrl, footerImageAlt } = settings
   return (
     <footer className="site-footer">
-      <Image src="/images/hero.png" alt="" fill sizes="100vw" className="site-footer-bg" />
+      <Image src={footerImageUrl ?? '/images/hero.png'} alt={footerImageAlt} fill sizes="100vw" className="site-footer-bg" />
       <div className="site-footer-overlay" />
       <div className="site-footer-content container">
-        <p className="site-footer-brand">ルーガンド商会 商店街</p>
-        <a href="https://jp.finalfantasyxiv.com/lodestone/community_finder/5d615327600055511e43ecc06a75388b1b530ae2/" target="_blank" rel="noreferrer" className="site-footer-link">
-          FINAL FANTASY XIV ルーガンド商会 追加メンバー募集中 <span aria-hidden="true">↗</span>
-        </a>
-        <dl className="site-footer-info">
-          <div>
-            <dt>サーバー</dt>
-            <dd>Zeromus @ Meteor DC</dd>
-          </div>
-          <div>
-            <dt>所在地</dt>
-            <dd>ゴブレットビュート 18区45番地</dd>
-          </div>
-          <div>
-            <dt>お問い合わせ</dt>
-            <dd>商会長・Dudek Rugand</dd>
-          </div>
-        </dl>
+        <p className="site-footer-brand">{mallName}</p>
+        {recruitingText && (
+          recruitingUrl ? (
+            <a href={recruitingUrl} target="_blank" rel="noreferrer" className="site-footer-link">
+              {recruitingText} <span aria-hidden="true">↗</span>
+            </a>
+          ) : (
+            <p className="site-footer-link">{recruitingText}</p>
+          )
+        )}
+        {(server || location || contactText) && (
+          <dl className="site-footer-info">
+            {server && (
+              <div>
+                <dt>サーバー</dt>
+                <dd>{server}</dd>
+              </div>
+            )}
+            {location && (
+              <div>
+                <dt>所在地</dt>
+                <dd>{location}</dd>
+              </div>
+            )}
+            {contactText && (
+              <div>
+                <dt>お問い合わせ</dt>
+                <dd>
+                  {contactLinkUrl ? (
+                    <a href={contactLinkUrl} target="_blank" rel="noreferrer">{contactText}</a>
+                  ) : (
+                    contactText
+                  )}
+                </dd>
+              </div>
+            )}
+          </dl>
+        )}
       </div>
     </footer>
   )

@@ -95,9 +95,11 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     vercelUsageMonitor: VercelUsageMonitor;
+    siteSettings: SiteSetting;
   };
   globalsSelect: {
     vercelUsageMonitor: VercelUsageMonitorSelect<false> | VercelUsageMonitorSelect<true>;
+    siteSettings: SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -624,11 +626,68 @@ export interface VercelUsageMonitor {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "siteSettings".
+ */
+export interface SiteSetting {
+  id: number;
+  /**
+   * 未設定の場合は既定の画像を使用します
+   */
+  headerImage?: (number | null) | Media;
+  tagline?: string | null;
+  /**
+   * 未設定の場合は既定の画像を使用します
+   */
+  footerImage?: (number | null) | Media;
+  mallName: string;
+  server?: string | null;
+  location?: string | null;
+  contactText?: string | null;
+  contactLinkEnabled?: boolean | null;
+  /**
+   * 別タブで開きます
+   */
+  contactLinkUrl?: string | null;
+  recruitingEnabled?: boolean | null;
+  /**
+   * 例: FINAL FANTASY XIV ルーガンド商会 追加メンバー募集中
+   */
+  recruitingText?: string | null;
+  /**
+   * 別タブで開きます
+   */
+  recruitingUrl?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "vercelUsageMonitor_select".
  */
 export interface VercelUsageMonitorSelect<T extends boolean = true> {
   periodKey?: T;
   notifiedThreshold?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "siteSettings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  headerImage?: T;
+  tagline?: T;
+  footerImage?: T;
+  mallName?: T;
+  server?: T;
+  location?: T;
+  contactText?: T;
+  contactLinkEnabled?: T;
+  contactLinkUrl?: T;
+  recruitingEnabled?: T;
+  recruitingText?: T;
+  recruitingUrl?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
