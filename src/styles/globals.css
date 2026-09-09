@@ -175,7 +175,8 @@ section > h2::before { content: ''; position: absolute; left: 0; top: .15em; bot
 .mall-schedule-day-number { display: block; font-size: var(--text-xs); }
 .mall-schedule-entries { list-style: none; margin: .2em 0 0; padding: 0; }
 .mall-schedule-entries li + li { margin-top: .15em; }
-.mall-schedule-entries a { display: block; min-width: 0; font-size: var(--text-xs); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 店名は1行では収まりきらないことが多いため2行までは折り返し、それ以上は省略する(超過分は…で切る) */
+.mall-schedule-entries a { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; min-width: 0; font-size: var(--text-xs); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: normal; }
 /* 商店街全体のイベント(Eventsの「カレンダーに表示」)は、他のリボン表現と同じワインレッドで店舗の予定と区別する */
 .mall-schedule-entries li.is-event a { color: var(--color-ribbon); font-weight: 700; }
 @media (max-width: 30rem) {
