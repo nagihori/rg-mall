@@ -66,6 +66,20 @@ export const SiteSettings: GlobalConfig = {
             },
           ],
         },
+        {
+          label: 'FCイベント',
+          fields: [
+            {
+              name: 'fcEvents', type: 'array', label: 'FC内部イベント', labels: { singular: 'イベント', plural: 'イベント' },
+              admin: { description: '商店街メンバー向けの内部イベント(公開サイトには表示されません)。詳細はDiscordで運用するため、ここでは管理画面カレンダーに出す日付とタイトルだけを登録します。' },
+              fields: [
+                { name: 'date', type: 'date', label: '日付', required: true, admin: { date: { pickerAppearance: 'dayOnly', displayFormat: 'yyyy/MM/dd' } } },
+                { name: 'title', type: 'text', label: 'タイトル', required: true, maxLength: 60 },
+                { name: 'link', type: 'text', label: '外部リンク(任意)', admin: { description: '例: Discordのメッセージリンク。別タブで開きます' } },
+              ],
+            },
+          ],
+        },
       ],
     },
   ],

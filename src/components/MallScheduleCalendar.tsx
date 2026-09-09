@@ -27,7 +27,7 @@ export function MallScheduleCalendar({ months, entries }: { months: MallCalendar
                     // (店舗の重複開催は稀に2件程度までの想定のため、3件以上でも1行のまま高さで吸収する)。
                     <ul className={`mall-schedule-entries${dayEntries.length > 1 ? ' is-dense' : ''}`}>
                       {dayEntries.map((entry, i) => (
-                        <li key={i} className={entry.kind === 'event' ? 'is-event' : undefined}>
+                        <li key={i} className={`is-${entry.kind}`}>
                           <Link href={entry.href} title={entry.note ?? undefined}>{entry.label}</Link>
                         </li>
                       ))}

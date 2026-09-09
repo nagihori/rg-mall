@@ -231,3 +231,144 @@ body,
 .document-fields__sidebar-wrap:has(.react-datepicker-popper) {
   overflow: visible;
 }
+
+/* ナビ最下部の「商店街カレンダー」リンク。他のナビグループと見た目を揃えつつ独立した導線として少し余白を空ける。 */
+.mall-calendar-nav-link {
+  margin-top: var(--base);
+  padding: 0 calc(var(--base) * 0.8);
+}
+.mall-calendar-nav-link a {
+  display: block;
+  padding: calc(var(--base) / 4) 0;
+  color: var(--theme-text);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.mall-calendar-nav-link a:hover {
+  color: var(--theme-elevation-600);
+}
+
+/* 管理画面「商店街カレンダー」。店舗営業日/商店街イベント/FC内部イベントの種別を色分けで判別できるよう、
+   日付セルを固定の濃色背景にして、白字(店舗)・白地帯(商店街イベント)・灰色文字(FC内部イベント)を出し分ける。 */
+.admin-mall-calendar-view {
+  padding-top: var(--base);
+  padding-bottom: calc(var(--base) * 2);
+}
+.admin-mall-calendar-view-lead {
+  color: var(--theme-elevation-600);
+  margin-bottom: var(--base);
+}
+.admin-mall-calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--base);
+  list-style: none;
+  margin: 0 0 var(--base);
+  padding: 0;
+  font-size: 0.8rem;
+  color: var(--theme-elevation-600);
+}
+.admin-mall-calendar-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--base) / 4);
+}
+.admin-mall-calendar-legend-swatch {
+  display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  border-radius: 2px;
+  background: #2b2b33;
+}
+.admin-mall-calendar-legend li.is-store .admin-mall-calendar-legend-swatch { box-shadow: inset 0 0 0 1px #fff; }
+.admin-mall-calendar-legend li.is-event .admin-mall-calendar-legend-swatch { background: #fff; }
+.admin-mall-calendar-legend li.is-fcEvent .admin-mall-calendar-legend-swatch { background: #8b8b96; }
+
+.admin-mall-calendar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--base) * 1.5);
+}
+.admin-mall-calendar-month {
+  flex: 1 1 22rem;
+  min-width: 0;
+}
+.admin-mall-calendar-month h3 {
+  margin: 0 0 calc(var(--base) / 2);
+}
+.admin-mall-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--theme-elevation-150);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.admin-mall-calendar-weekday {
+  background: var(--theme-elevation-50);
+  color: var(--theme-elevation-600);
+  padding: calc(var(--base) / 4) 0;
+  text-align: center;
+  font-size: 0.75rem;
+}
+.admin-mall-calendar-day {
+  background: #2b2b33;
+  min-height: 4.5rem;
+  min-width: 0;
+  padding: calc(var(--base) / 4);
+}
+.admin-mall-calendar-day.is-outside {
+  background: #1c1c22;
+}
+.admin-mall-calendar-day.is-today {
+  box-shadow: inset 0 0 0 2px var(--theme-success-500);
+}
+.admin-mall-calendar-day-number {
+  display: block;
+  font-size: 0.75rem;
+  color: #cfcfd6;
+}
+.admin-mall-calendar-day.is-outside .admin-mall-calendar-day-number {
+  color: #5a5a63;
+}
+.admin-mall-calendar-entries {
+  list-style: none;
+  margin: calc(var(--base) / 4) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--base) / 4);
+}
+.admin-mall-calendar-entries li {
+  font-size: 0.7rem;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin-mall-calendar-entries li a,
+.admin-mall-calendar-entries li span {
+  color: inherit;
+  text-decoration: none;
+}
+/* 店舗営業日: 白字 */
+.admin-mall-calendar-entries li.is-store {
+  color: #fff;
+}
+/* 商店街イベント: 白地帯(帯状の背景) */
+.admin-mall-calendar-entries li.is-event {
+  background: #fff;
+  color: #1c1c22;
+  font-weight: 700;
+  padding: 0 calc(var(--base) / 4);
+  border-radius: 2px;
+}
+/* FC内部イベント: 灰色文字 */
+.admin-mall-calendar-entries li.is-fcEvent {
+  color: #8b8b96;
+}
+@media (max-width: 30rem) {
+  .admin-mall-calendar-day { min-height: 3.5rem; }
+  .admin-mall-calendar-entries li { font-size: 0.65rem; }
+}

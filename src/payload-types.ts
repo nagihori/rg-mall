@@ -657,6 +657,20 @@ export interface SiteSetting {
    * 別タブで開きます
    */
   recruitingUrl?: string | null;
+  /**
+   * 商店街メンバー向けの内部イベント(公開サイトには表示されません)。詳細はDiscordで運用するため、ここでは管理画面カレンダーに出す日付とタイトルだけを登録します。
+   */
+  fcEvents?:
+    | {
+        date: string;
+        title: string;
+        /**
+         * 例: Discordのメッセージリンク。別タブで開きます
+         */
+        link?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -688,6 +702,14 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   recruitingEnabled?: T;
   recruitingText?: T;
   recruitingUrl?: T;
+  fcEvents?:
+    | T
+    | {
+        date?: T;
+        title?: T;
+        link?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

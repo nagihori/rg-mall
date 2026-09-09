@@ -2,6 +2,8 @@ import { cache } from 'react'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { SITE_NAME, SITE_DESCRIPTION } from '@/lib/siteMeta'
+import { buildMallCalendarFcEventEntries } from '@/lib/presenters/fcEvent'
+import type { MallCalendarEntry } from '@/lib/domain/mallCalendar'
 
 export type SiteSettingsViewModel = {
   mallName: string
@@ -44,3 +46,9 @@ export const getSiteSettings = cache(async (): Promise<SiteSettingsViewModel> =>
     footerImageAlt: toImageAlt(doc.footerImage),
   }
 })
+// 管理画面カレンダー用。FC内部イベント(日付・タイトル・任意の外部リンクのみ)をエントリ化する。
+export async function getFcEventCalendarEntries(): Promise<MallCalendarEntry[]> {
+  const payload = await getPayload({ config })
+  const doc = await payload.findGlobal({ slug: 'siteSettings', depth: 0, select: { fcEvents: true } })
+  return buildMallCalendarFcEventEntries((doc.fcEvents ?? []).map((event) => ({ title: event.title, date: event.date, link: event.link ?? null })))
+}

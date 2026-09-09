@@ -16,6 +16,7 @@ import * as migration_20260909_221240_stores_schedule_dates from './20260909_221
 import * as migration_20260909_223119_events_show_on_mall_calendar from './20260909_223119_events_show_on_mall_calendar';
 import * as migration_20260909_224513_site_settings_global from './20260909_224513_site_settings_global';
 import * as migration_20260909_230127_site_settings_header_footer_images from './20260909_230127_site_settings_header_footer_images';
+import * as migration_20260909_231151_mall_calendar_fc_events from './20260909_231151_mall_calendar_fc_events';
 
 export const migrations = [
   {
@@ -106,6 +107,11 @@ export const migrations = [
   {
     up: migration_20260909_230127_site_settings_header_footer_images.up,
     down: migration_20260909_230127_site_settings_header_footer_images.down,
-    name: '20260909_230127_site_settings_header_footer_images'
+    name: '20260909_230127_site_settings_header_footer_images',
+  },
+  {
+    up: migration_20260909_231151_mall_calendar_fc_events.up,
+    down: migration_20260909_231151_mall_calendar_fc_events.down,
+    name: '20260909_231151_mall_calendar_fc_events'
   },
 ];

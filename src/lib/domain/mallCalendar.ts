@@ -1,5 +1,6 @@
 // トップページ「商店街スケジュール」カレンダーの箱組みと、店舗/イベント共通の予定エントリ型。
-export type MallCalendarEntry = { dateKey: string; label: string; href: string; note: string | null; kind: 'store' | 'event' }
+// kind: 'store'=店舗営業日 / 'event'=商店街全体イベント / 'fcEvent'=FC内部イベント(管理画面カレンダーのみで使用、公開サイトには出さない)
+export type MallCalendarEntry = { dateKey: string; label: string; href: string; note: string | null; kind: 'store' | 'event' | 'fcEvent'; externalUrl?: string | null }
 export type MallCalendarDay = { dateKey: string; day: number; inMonth: boolean; isToday: boolean }
 export type MallCalendarMonth = { label: string; weeks: MallCalendarDay[][] }
 

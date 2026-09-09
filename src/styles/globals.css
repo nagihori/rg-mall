@@ -179,8 +179,16 @@ section > h2::before { content: ''; position: absolute; left: 0; top: .15em; bot
 .mall-schedule-entries a { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; min-width: 0; font-size: var(--text-xs); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: normal; }
 /* 同日に2件以上並ぶ日は、合計の行数が膨らみすぎないよう1件あたり1行に切り詰める */
 .mall-schedule-entries.is-dense a { -webkit-line-clamp: 1; }
-/* 商店街全体のイベント(Eventsの「カレンダーに表示」)は、他のリボン表現と同じワインレッドで店舗の予定と区別する */
-.mall-schedule-entries li.is-event a { color: var(--color-ribbon); font-weight: 700; }
+/* 店舗の営業予定日は色文字で示す(通常のリンク色よりわずかに濃く、視認性を上げる) */
+.mall-schedule-entries li.is-store a { color: var(--color-green); font-weight: 600; }
+/* 商店街全体のイベント(Eventsの「カレンダーに表示」)は、他のリボン表現と同じワインレッドの色帯で店舗の予定と区別する */
+.mall-schedule-entries li.is-event a {
+  background: var(--color-ribbon);
+  color: var(--color-bg);
+  font-weight: 700;
+  padding: 0 .3em;
+  border-radius: 2px;
+}
 @media (max-width: 30rem) {
   .mall-schedule-day { min-height: 3rem; }
   .mall-schedule-entries a { font-size: .65rem; }
