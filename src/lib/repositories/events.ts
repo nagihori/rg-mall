@@ -1,7 +1,8 @@
 import { cache } from 'react'
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { presentEventCard, presentEventDetail, presentEventPreview, type EventCardViewModel, type EventDetailViewModel, type PublicEvent } from '@/lib/presenters/event'
+import { buildMallCalendarEventEntries, presentEventCard, presentEventDetail, presentEventPreview, type EventCardViewModel, type EventDetailViewModel, type PublicEvent } from '@/lib/presenters/event'
+import type { MallCalendarEntry } from '@/lib/domain/mallCalendar'
 
 function toEventImage(media: any) {
   return typeof media === 'object' && media?.url
@@ -39,6 +40,16 @@ export const getAdjacentEvents = cache(async (slug: string): Promise<{ prev: Eve
   const nextDoc = results.docs[index + 1]
   return { prev: prevDoc ? presentEventCard(toPublicEvent(prevDoc)) : null, next: nextDoc ? presentEventCard(toPublicEvent(nextDoc)) : null }
 })
+// トップページのカレンダー用。「カレンダーに表示」がオンの商店街全体イベントだけを、開始〜終了日で展開する。
+export async function getMallCalendarEventEntries(): Promise<MallCalendarEntry[]> {
+  const payload = await getPayload({ config })
+  const results = await payload.find({
+    collection: 'events', limit: 100, depth: 0,
+    where: { status: { in: ['published', 'archived'] }, showOnMallCalendar: { equals: true } },
+    select: { title: true, slug: true, startsAt: true, endsAt: true },
+  })
+  return buildMallCalendarEventEntries(results.docs.map((doc: any) => ({ title: doc.title, slug: doc.slug, startsAt: doc.startsAt, endsAt: doc.endsAt })))
+}
 // ステータスを問わず、IDで直接引いて公開ページと同じ見た目を組み立てるプレビュー専用。
 // 呼び出し側(プレビューのルート)でログイン中CMSユーザーかどうかを確認してから使うこと。
 export async function getPreviewEvent(id: string): Promise<EventDetailViewModel | null> {

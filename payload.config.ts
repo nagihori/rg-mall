@@ -13,6 +13,7 @@ import { Users } from './src/cms/collections/users'
 import { Media } from './src/cms/collections/media'
 import { AuditLogs } from './src/cms/collections/auditLogs'
 import { VercelUsageMonitor } from './src/cms/globals/vercelUsageMonitor'
+import { SiteSettings } from './src/cms/globals/siteSettings'
 
 const databaseURL = process.env.DATABASE_URL
 const configDir = dirname(fileURLToPath(import.meta.url))
@@ -29,6 +30,13 @@ export default buildConfig({
     components: {
       beforeLogin: ['./src/cms/components/DiscordLoginButton.tsx'],
       providers: ['./src/cms/components/AdminFont.tsx'],
+      afterNavLinks: ['./src/cms/components/MallCalendarNavLink.tsx'],
+      views: {
+        mallCalendar: {
+          Component: './src/cms/components/MallCalendarAdminView.tsx',
+          path: '/mall-calendar',
+        },
+      },
     },
   },
   i18n: {
@@ -50,7 +58,7 @@ export default buildConfig({
   editor: lexicalEditor(),
   sharp,
   collections: [Users, Events, Stores, Media, AuditLogs],
-  globals: [VercelUsageMonitor],
+  globals: [VercelUsageMonitor, SiteSettings],
   plugins: [
     vercelBlobStorage({
       collections: {

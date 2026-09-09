@@ -162,6 +162,38 @@ section > h2::before { content: ''; position: absolute; left: 0; top: .15em; bot
 .past-card-thumb img { display: block; width: 100%; aspect-ratio: var(--thumb-ratio); object-fit: cover; margin: 0; border-radius: 0; }
 .past-card > p { margin: 0; color: var(--color-muted); font-size: var(--text-sm); }
 
+/* --- 商店街スケジュール(全店舗の営業予定日を当月・次月まとめて表示するカレンダー) --- */
+.mall-schedule { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-2); }
+.mall-schedule-month { flex: 1 1 20rem; min-width: 0; }
+.mall-schedule-month h3 { margin: 0 0 var(--space-1); font-family: var(--font-display); font-size: var(--text-base); color: var(--color-ink); }
+/* minmax(0, 1fr)にしないと、店名が長い日だけ1frトラックがcontentのmin-widthに引っ張られて列幅が揃わなくなる */
+.mall-schedule-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; background: var(--color-border); border: 1px solid var(--color-border); border-radius: var(--radius-sm); overflow: hidden; }
+.mall-schedule-weekday { background: var(--color-surface); padding: .3em 0; text-align: center; color: var(--color-muted); font-size: var(--text-xs); }
+.mall-schedule-day { background: var(--color-surface); min-width: 0; min-height: 4rem; padding: .3em; }
+.mall-schedule-day.is-outside { background: var(--color-bg); color: var(--color-muted); }
+.mall-schedule-day.is-today .mall-schedule-day-number { display: inline-flex; align-items: center; justify-content: center; width: 1.4em; height: 1.4em; border-radius: 50%; background: var(--color-gold-soft); color: var(--color-ink); }
+.mall-schedule-day-number { display: block; font-size: var(--text-xs); }
+.mall-schedule-entries { list-style: none; margin: .2em 0 0; padding: 0; }
+.mall-schedule-entries li + li { margin-top: .15em; }
+/* 店名は1行では収まりきらないことが多いため2行までは折り返し、それ以上は省略する(超過分は…で切る) */
+.mall-schedule-entries a { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; min-width: 0; font-size: var(--text-xs); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: normal; }
+/* 同日に2件以上並ぶ日は、合計の行数が膨らみすぎないよう1件あたり1行に切り詰める */
+.mall-schedule-entries.is-dense a { -webkit-line-clamp: 1; }
+/* 店舗の営業予定日は色文字で示す(通常のリンク色よりわずかに濃く、視認性を上げる) */
+.mall-schedule-entries li.is-store a { color: var(--color-green); font-weight: 600; }
+/* 商店街全体のイベント(Eventsの「カレンダーに表示」)は、他のリボン表現と同じワインレッドの色帯で店舗の予定と区別する */
+.mall-schedule-entries li.is-event a {
+  background: var(--color-ribbon);
+  color: var(--color-bg);
+  font-weight: 700;
+  padding: 0 .3em;
+  border-radius: 2px;
+}
+@media (max-width: 30rem) {
+  .mall-schedule-day { min-height: 3rem; }
+  .mall-schedule-entries a { font-size: .65rem; }
+}
+
 /* --- トップページの所属店舗紹介枠(控えめな小さいカード) --- */
 /* gridでauto-fitすると1件だけの時に幅いっぱいへ伸びてしまうため、flexで中央寄せしつつ自然な幅で並べる */
 .store-mini-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-3); margin-top: var(--space-2); }
@@ -278,6 +310,11 @@ section > h2::before { content: ''; position: absolute; left: 0; top: .15em; bot
   color: var(--color-ink); font-size: var(--text-sm); text-decoration: none;
 }
 .sns-link:hover { border-color: var(--color-gold); color: var(--color-gold); }
+
+/* --- 店舗詳細の営業予定日 --- */
+.store-schedule-list { margin: 0; padding: 0; list-style: none; }
+.store-schedule-list li + li { margin-top: .3em; }
+.store-schedule-note { color: var(--color-muted); font-size: var(--text-sm); }
 
 .prose { max-width: 48rem; line-height: 1.85; }
 .prose h1 { font-family: var(--font-display); font-size: var(--text-xl); }
