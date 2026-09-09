@@ -23,7 +23,9 @@ export function MallScheduleCalendar({ months, entries }: { months: MallCalendar
                 <div key={day.dateKey} className={`mall-schedule-day${day.inMonth ? '' : ' is-outside'}${day.isToday ? ' is-today' : ''}`}>
                   <span className="mall-schedule-day-number">{day.day}</span>
                   {dayEntries.length > 0 && (
-                    <ul className="mall-schedule-entries">
+                    // 1件だけなら店名を2行まで、2件以上並ぶ日は合計2行に収まるよう1件1行に切り詰める
+                    // (店舗の重複開催は稀に2件程度までの想定のため、3件以上でも1行のまま高さで吸収する)。
+                    <ul className={`mall-schedule-entries${dayEntries.length > 1 ? ' is-dense' : ''}`}>
                       {dayEntries.map((entry, i) => (
                         <li key={i} className={entry.kind === 'event' ? 'is-event' : undefined}>
                           <Link href={entry.href} title={entry.note ?? undefined}>{entry.label}</Link>
