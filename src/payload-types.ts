@@ -95,9 +95,11 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     vercelUsageMonitor: VercelUsageMonitor;
+    siteSettings: SiteSetting;
   };
   globalsSelect: {
     vercelUsageMonitor: VercelUsageMonitorSelect<false> | VercelUsageMonitorSelect<true>;
+    siteSettings: SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -174,6 +176,10 @@ export interface Event {
    * 開催場所（自由入力）
    */
   location?: string | null;
+  /**
+   * 商店街全体のイベントとして、トップページの「商店街スケジュール」カレンダーに開始日〜終了日を表示します。
+   */
+  showOnMallCalendar?: boolean | null;
   publishedAt?: string | null;
   slug?: string | null;
   status: 'draft' | 'in_review' | 'published' | 'archived';
@@ -277,6 +283,19 @@ export interface Store {
    * 例: 毎週土曜 21:00〜24:00（自由入力）
    */
   businessHours?: string | null;
+  /**
+   * 月に1〜2件程度を想定。店舗ページと、トップページの「商店街スケジュール」カレンダーに表示されます。
+   */
+  scheduleDates?:
+    | {
+        date: string;
+        /**
+         * 例: 限定メニューあり（任意・カレンダー上にも表示されます）
+         */
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * X(Twitter)やDiscordなど、店舗のSNS等へのリンクを複数登録できます
    */
@@ -436,6 +455,7 @@ export interface EventsSelect<T extends boolean = true> {
   startsAt?: T;
   endsAt?: T;
   location?: T;
+  showOnMallCalendar?: T;
   publishedAt?: T;
   slug?: T;
   status?: T;
@@ -464,6 +484,13 @@ export interface StoresSelect<T extends boolean = true> {
   ownerLodestoneEnabled?: T;
   ownerLodestoneUrl?: T;
   businessHours?: T;
+  scheduleDates?:
+    | T
+    | {
+        date?: T;
+        note?: T;
+        id?: T;
+      };
   snsLinks?:
     | T
     | {
@@ -599,11 +626,90 @@ export interface VercelUsageMonitor {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "siteSettings".
+ */
+export interface SiteSetting {
+  id: number;
+  /**
+   * 未設定の場合は既定の画像を使用します
+   */
+  headerImage?: (number | null) | Media;
+  tagline?: string | null;
+  /**
+   * 未設定の場合は既定の画像を使用します
+   */
+  footerImage?: (number | null) | Media;
+  mallName: string;
+  server?: string | null;
+  location?: string | null;
+  contactText?: string | null;
+  contactLinkEnabled?: boolean | null;
+  /**
+   * 別タブで開きます
+   */
+  contactLinkUrl?: string | null;
+  recruitingEnabled?: boolean | null;
+  /**
+   * 例: FINAL FANTASY XIV ルーガンド商会 追加メンバー募集中
+   */
+  recruitingText?: string | null;
+  /**
+   * 別タブで開きます
+   */
+  recruitingUrl?: string | null;
+  /**
+   * 商店街メンバー向けの内部イベント(公開サイトには表示されません)。詳細はDiscordで運用するため、ここでは管理画面カレンダーに出す日付とタイトルだけを登録します。
+   */
+  fcEvents?:
+    | {
+        date: string;
+        title: string;
+        /**
+         * 例: Discordのメッセージリンク。別タブで開きます
+         */
+        link?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "vercelUsageMonitor_select".
  */
 export interface VercelUsageMonitorSelect<T extends boolean = true> {
   periodKey?: T;
   notifiedThreshold?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "siteSettings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  headerImage?: T;
+  tagline?: T;
+  footerImage?: T;
+  mallName?: T;
+  server?: T;
+  location?: T;
+  contactText?: T;
+  contactLinkEnabled?: T;
+  contactLinkUrl?: T;
+  recruitingEnabled?: T;
+  recruitingText?: T;
+  recruitingUrl?: T;
+  fcEvents?:
+    | T
+    | {
+        date?: T;
+        title?: T;
+        link?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

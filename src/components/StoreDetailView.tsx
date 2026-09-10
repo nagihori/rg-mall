@@ -46,6 +46,21 @@ export function StoreDetailView({ store }: { store: StoreDetailViewModel }) {
                   </dd>
                 </div>
                 {store.businessHours && <div><dt>基本営業時間</dt><dd>{store.businessHours}</dd></div>}
+                {store.scheduleDates.length > 0 && (
+                  <div>
+                    <dt>営業予定日</dt>
+                    <dd>
+                      <ul className="store-schedule-list">
+                        {store.scheduleDates.map((entry) => (
+                          <li key={entry.dateKey}>
+                            {entry.label}
+                            {entry.note && <span className="store-schedule-note"> {entry.note}</span>}
+                          </li>
+                        ))}
+                      </ul>
+                    </dd>
+                  </div>
+                )}
                 {store.snsLinks.length > 0 && (
                   <div>
                     <dt>SNS</dt>

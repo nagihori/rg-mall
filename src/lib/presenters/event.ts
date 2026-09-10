@@ -1,4 +1,5 @@
 import { classifyEvent, type EventCategory, type EventStatus } from '@/lib/domain/events'
+import { nextDateKey, toDateKey, type MallCalendarEntry } from '@/lib/domain/mallCalendar'
 
 type EventImage = { url: string; alt: string; thumbnailUrl?: string | null; cardUrl?: string | null; detailUrl?: string | null; detailWidth?: number | null; detailHeight?: number | null }
 export type PublicEvent = { id: string; title: string; slug: string; summary: string; body: unknown; location?: string | null; startsAt?: string | null; endsAt?: string | null; publishedAt?: string | null; status: EventStatus; heroImage?: EventImage | null; galleryImages?: EventImage[] }
@@ -42,6 +43,23 @@ export function presentEventCard(event: PublicEvent, now = new Date()): EventCar
 export function presentEventDetail(event: PublicEvent, now = new Date()): EventDetailViewModel | null {
   const category = classifyEvent(event, now); if (!category) return null
   return buildDetail(event, buildCard(event, category))
+}
+// トップページ「商店街スケジュール」カレンダー用。開始日〜終了日(複数日の場合は各日)を展開してエントリ化する。
+// 誤って極端に長い期間が入力されても暴走しないよう、展開は31日分までに打ち切る。
+export function buildMallCalendarEventEntries(events: { title: string; slug: string; startsAt?: string | null; endsAt?: string | null }[], now = new Date()): MallCalendarEntry[] {
+  const todayKey = toDateKey(now)
+  const entries: MallCalendarEntry[] = []
+  for (const event of events) {
+    if (!event.startsAt) continue
+    const startKey = toDateKey(event.startsAt)
+    const endKey = event.endsAt ? toDateKey(event.endsAt) : startKey
+    let dateKey = startKey
+    for (let i = 0; i < 31 && dateKey <= endKey; i++, dateKey = nextDateKey(dateKey)) {
+      if (dateKey < todayKey) continue
+      entries.push({ dateKey, label: event.title, href: `/events/${event.slug}`, note: null, kind: 'event' })
+    }
+  }
+  return entries
 }
 // 下書き・確認待ちのプレビュー専用。公開/アーカイブ以外は分類上nullになるが、
 // プレビューでは分類できなくても見た目を確認したいだけなので'new'扱いで表示だけ作る。

@@ -1,7 +1,8 @@
 import { cache } from 'react'
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { presentStoreCard, presentStoreDetail, type PublicStore, type StoreCardViewModel, type StoreDetailViewModel } from '@/lib/presenters/store'
+import { buildMallCalendarStoreEntries, presentStoreCard, presentStoreDetail, type PublicStore, type StoreCardViewModel, type StoreDetailViewModel } from '@/lib/presenters/store'
+import type { MallCalendarEntry } from '@/lib/domain/mallCalendar'
 
 function toStoreImage(media: any) {
   return typeof media === 'object' && media?.url
@@ -21,6 +22,7 @@ function toPublicStore(doc: any): PublicStore {
     galleryImages: (doc.galleryImages ?? []).map(toStoreImage).filter((image: ReturnType<typeof toStoreImage>) => image !== null),
     ownerLodestoneEnabled: doc.ownerLodestoneEnabled ?? false, ownerLodestoneUrl: doc.ownerLodestoneUrl ?? null,
     snsLinks: doc.snsLinks ?? [],
+    scheduleDates: (doc.scheduleDates ?? []).map((entry: any) => ({ date: entry.date, note: entry.note ?? null })),
   }
 }
 
@@ -37,3 +39,12 @@ export const getPublicStore = cache(async (slug: string): Promise<StoreDetailVie
   const doc = results.docs[0]
   return doc ? presentStoreDetail(toPublicStore(doc)) : null
 })
+// トップページのカレンダー用。画像やSNSリンクなど不要なフィールドは取らず、店舗名・スラッグ・予定日だけに絞る。
+export async function getMallCalendarStoreEntries(): Promise<MallCalendarEntry[]> {
+  const payload = await getPayload({ config })
+  const results = await payload.find({
+    collection: 'stores', limit: 100, depth: 0,
+    select: { name: true, slug: true, scheduleDates: true },
+  })
+  return buildMallCalendarStoreEntries(results.docs.map((doc: any) => ({ name: doc.name, slug: doc.slug, scheduleDates: doc.scheduleDates ?? [] })))
+}
