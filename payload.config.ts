@@ -30,13 +30,7 @@ export default buildConfig({
     components: {
       beforeLogin: ['./src/cms/components/DiscordLoginButton.tsx'],
       providers: ['./src/cms/components/AdminFont.tsx'],
-      afterNavLinks: ['./src/cms/components/MallCalendarNavLink.tsx'],
-      views: {
-        mallCalendar: {
-          Component: './src/cms/components/MallCalendarAdminView.tsx',
-          path: '/mall-calendar',
-        },
-      },
+      afterDashboard: ['./src/cms/components/DashboardMallCalendar.tsx'],
     },
   },
   i18n: {
