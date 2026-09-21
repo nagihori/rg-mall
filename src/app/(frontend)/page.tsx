@@ -8,10 +8,27 @@ import { MallScheduleCalendar } from '@/components/MallScheduleCalendar'
 import { getMallCalendarEventEntries, getPublicEvents } from '@/lib/repositories/events'
 import { getMallCalendarStoreEntries, getPublicStores } from '@/lib/repositories/stores'
 import { buildMallCalendarMonths } from '@/lib/domain/mallCalendar'
+import { getSiteSettings } from '@/lib/repositories/siteSettings'
+import { renderMetaTemplate } from '@/lib/siteMeta'
 // CMS側でイベントが変更されるたびに revalidatePublicEventPaths が即時反映するため、
 // これは取りこぼし対策のフォールバックとしての秒数。
 export const revalidate = 60
-export const metadata: Metadata = { title: 'イベントのお知らせ' }
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings()
+  const title = renderMetaTemplate(settings.homeTitleTemplate, { site_title: settings.mallName })
+  return {
+    title: { absolute: title },
+    description: settings.siteDescription,
+    openGraph: {
+      title,
+      description: settings.siteDescription,
+      images: settings.ogImageUrl
+        ? [{ url: settings.ogImageUrl, ...(settings.ogImageWidth && settings.ogImageHeight ? { width: settings.ogImageWidth, height: settings.ogImageHeight } : {}) }]
+        : undefined,
+    },
+  }
+}
 
 export default async function HomePage() {
   const [events, stores, storeScheduleEntries, eventCalendarEntries] = await Promise.all([

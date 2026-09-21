@@ -1,17 +1,20 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getPublicStore } from '@/lib/repositories/stores'
+import { getSiteSettings } from '@/lib/repositories/siteSettings'
+import { renderMetaTemplate } from '@/lib/siteMeta'
 import { StoreDetailView } from '@/components/StoreDetailView'
 export const revalidate = 60
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const store = await getPublicStore((await params).slug)
+  const [store, settings] = await Promise.all([getPublicStore((await params).slug), getSiteSettings()])
   if (!store) return {}
+  const title = renderMetaTemplate(settings.storeTitleTemplate, { store_title: store.name, site_title: settings.mallName })
   return {
-    title: store.name,
+    title: { absolute: title },
     description: store.summary,
     openGraph: {
-      title: store.name,
+      title,
       description: store.summary,
       images: store.cover ? [{ url: store.cover.url }] : undefined,
     },

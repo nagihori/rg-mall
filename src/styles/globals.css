@@ -155,7 +155,8 @@ section > h2::before { content: ''; position: absolute; left: 0; top: .15em; bot
 
 /* --- これまでのイベント(過去回のダイジェスト) --- */
 .past-section { display: grid; grid-template-columns: 1fr auto; align-items: baseline; column-gap: var(--space-2); }
-.past-section .grid { grid-column: 1 / -1; }
+/* auto-fit+1frは件数が少ないとカードが余白を埋めて伸びてしまうため、1件でも常に3分の1幅を上限にする */
+.past-section .grid { grid-column: 1 / -1; grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), calc((100% - var(--space-3) * 2) / 3))); }
 .past-section .more-link { font-size: var(--text-sm); white-space: nowrap; }
 .past-card h3 { margin: 0 0 var(--space-1); font-family: var(--font-display); font-size: var(--text-base); }
 .past-card-thumb { display: block; margin-bottom: var(--space-1); overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-sm); box-shadow: var(--shadow-card); }
@@ -357,6 +358,13 @@ section > h2::before { content: ''; position: absolute; left: 0; top: .15em; bot
   flex-direction: column;
   justify-content: flex-end;
   padding-bottom: var(--space-4);
+}
+/* 狭い画面では所在地等が1列積みになり文言も長くなるため、固定のaspect-ratio/min-heightだと
+   コンテンツが枠からあふれて上部に窮屈に詰まり、グラデーションの効かない明るい帯に文字が重なって読めなくなる。
+   モバイルではletterbox比率をやめてコンテンツの高さに追従させ、暗幕もコンテンツ全体を覆うよう強めにする */
+@media (max-width: 42rem) {
+  .site-footer { aspect-ratio: auto; min-height: 14rem; }
+  .site-footer-overlay { background: linear-gradient(to bottom, rgba(33, 28, 21, .35) 0%, rgba(33, 28, 21, .85) 35%, rgba(33, 28, 21, .96) 100%); }
 }
 .site-footer-brand { margin: 0 0 var(--space-1); font-family: var(--font-display); font-size: var(--text-lg); letter-spacing: .04em; }
 .site-footer-link {
