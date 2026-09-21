@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { partitionFcEventsByEnded, sortFcEventsByDate } from '@/lib/presenters/fcEvent'
 
 export const dynamic = 'force-dynamic'
 
@@ -32,5 +33,13 @@ export async function GET(request: NextRequest) {
     await payload.update({ collection: 'events', id: doc.id, data: { status: 'archived' }, overrideAccess: true })
   }
 
-  return NextResponse.json({ archived: targets.map((doc) => doc.id) })
+  // FC内部イベント(商店街設定の配列)は状態を持たないため、開催日を過ぎたものは配列から外して
+  // アーカイブ扱いにする(復元は想定しない)。残りは日付の古い順に揃える。
+  const settings = await payload.findGlobal({ slug: 'siteSettings', depth: 0, select: { fcEvents: true } })
+  const { active, ended } = partitionFcEventsByEnded(settings.fcEvents ?? [])
+  if (ended.length > 0) {
+    await payload.updateGlobal({ slug: 'siteSettings', data: { fcEvents: sortFcEventsByDate(active) }, overrideAccess: true })
+  }
+
+  return NextResponse.json({ archived: targets.map((doc) => doc.id), archivedFcEvents: ended.map((event) => event.title) })
 }
