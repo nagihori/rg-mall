@@ -4,7 +4,7 @@ const weekdayLabels = ['日', '月', '火', '水', '木', '金', '土']
 const kindLabels: Record<MallCalendarEntry['kind'], string> = { store: '店舗営業日', event: '商店街イベント', fcEvent: 'FC内部イベント' }
 
 // 管理画面カレンダー(公開サイトのMallScheduleCalendarとは別物)。
-// 店舗営業日=白字/商店街イベント=白地帯/FC内部イベント=灰色文字、で種別を判別できるようにする。
+// 店舗営業日=通常文字/商店街イベント=反転帯/FC内部イベント=淡い文字(色はテーマ追従)、で種別を判別できるようにする。
 export function AdminMallCalendar({ months, entries }: { months: MallCalendarMonth[]; entries: MallCalendarEntry[] }) {
   const entriesByDate = new Map<string, MallCalendarEntry[]>()
   for (const entry of entries) {

@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload'
 import { canEdit } from '../access'
+import { sortFcEventsByDate } from '@/lib/presenters/fcEvent'
 import { revalidatePublicSitePaths } from '@/lib/cache/revalidateSiteSettings'
 import {
   DEFAULT_HOME_TITLE_TEMPLATE,
@@ -14,6 +15,11 @@ export const SiteSettings: GlobalConfig = {
   label: '商店街設定',
   access: { read: () => true, update: canEdit },
   hooks: {
+    // FCイベントは保存時に日付の古い順へ並べ替える(管理画面の一覧を常に時系列にする)
+    beforeChange: [({ data }) => {
+      if (Array.isArray(data?.fcEvents)) data.fcEvents = sortFcEventsByDate(data.fcEvents)
+      return data
+    }],
     afterChange: [async ({ doc }) => {
       revalidatePublicSitePaths()
       return doc
