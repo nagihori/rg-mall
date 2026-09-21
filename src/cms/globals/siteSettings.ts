@@ -1,6 +1,11 @@
 import type { GlobalConfig } from 'payload'
 import { canEdit } from '../access'
 import { revalidatePublicSitePaths } from '@/lib/cache/revalidateSiteSettings'
+import {
+  DEFAULT_HOME_TITLE_TEMPLATE,
+  DEFAULT_EVENT_TITLE_TEMPLATE,
+  DEFAULT_STORE_TITLE_TEMPLATE,
+} from '@/lib/siteMeta'
 
 // フッターに表示する商店街全体の情報(名称・所在地・連絡先・追加メンバー募集)。全ページ共通のため
 // 読み取りは常に許可し、更新は他の記事コレクションと同じくcanEdit(editor以上)に揃える。
@@ -63,6 +68,34 @@ export const SiteSettings: GlobalConfig = {
                 if (!siblingData?.recruitingEnabled) return true
                 return Boolean(value) || '表示する場合はリンク先URLが必須です'
               },
+            },
+          ],
+        },
+        {
+          label: 'メタ情報',
+          fields: [
+            {
+              name: 'homeTitleTemplate', type: 'text', label: 'title(トップページ)', maxLength: 120,
+              defaultValue: DEFAULT_HOME_TITLE_TEMPLATE,
+              admin: { description: '使える変数: {{site_title}}(商店街名)' },
+            },
+            {
+              name: 'eventTitleTemplate', type: 'text', label: 'title(イベント詳細)', maxLength: 120,
+              defaultValue: DEFAULT_EVENT_TITLE_TEMPLATE,
+              admin: { description: '使える変数: {{event_title}}(イベント名) / {{site_title}}(商店街名)' },
+            },
+            {
+              name: 'storeTitleTemplate', type: 'text', label: 'title(店舗詳細)', maxLength: 120,
+              defaultValue: DEFAULT_STORE_TITLE_TEMPLATE,
+              admin: { description: '使える変数: {{store_title}}(店舗名) / {{site_title}}(商店街名)' },
+            },
+            {
+              name: 'siteDescription', type: 'textarea', label: 'description(トップページ)', maxLength: 200,
+              admin: { placeholder: 'タグライン', description: '未入力の場合はヘッダーのタグラインを使用します' },
+            },
+            {
+              name: 'ogImage', type: 'relationship', relationTo: 'media', label: 'OGP画像(トップページ)',
+              admin: { description: 'SNS等でトップページのリンクを共有した際に表示される画像。未設定の場合はヘッダー画像を使用します' },
             },
           ],
         },

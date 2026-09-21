@@ -658,6 +658,26 @@ export interface SiteSetting {
    */
   recruitingUrl?: string | null;
   /**
+   * 使える変数: {{site_title}}(商店街名)
+   */
+  homeTitleTemplate?: string | null;
+  /**
+   * 使える変数: {{event_title}}(イベント名) / {{site_title}}(商店街名)
+   */
+  eventTitleTemplate?: string | null;
+  /**
+   * 使える変数: {{store_title}}(店舗名) / {{site_title}}(商店街名)
+   */
+  storeTitleTemplate?: string | null;
+  /**
+   * 未入力の場合はヘッダーのタグラインを使用します
+   */
+  siteDescription?: string | null;
+  /**
+   * SNS等でトップページのリンクを共有した際に表示される画像。未設定の場合はヘッダー画像を使用します
+   */
+  ogImage?: (number | null) | Media;
+  /**
    * 商店街メンバー向けの内部イベント(公開サイトには表示されません)。詳細はDiscordで運用するため、ここでは管理画面カレンダーに出す日付とタイトルだけを登録します。
    */
   fcEvents?:
@@ -702,6 +722,11 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   recruitingEnabled?: T;
   recruitingText?: T;
   recruitingUrl?: T;
+  homeTitleTemplate?: T;
+  eventTitleTemplate?: T;
+  storeTitleTemplate?: T;
+  siteDescription?: T;
+  ogImage?: T;
   fcEvents?:
     | T
     | {
