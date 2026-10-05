@@ -678,6 +678,10 @@ export interface SiteSetting {
    */
   ogImage?: (number | null) | Media;
   /**
+   * オンの場合、Google等の検索エンジンがサイトを巡回し、検索結果に表示されることがあります。オフにすると、robots.txt と各ページのnoindex指定で巡回・検索結果への掲載を控えるよう求めます(公開直前の調整中などに便利です)。ただしこれは「お願い」であり、URLを知っている人がアクセスすることや、従わないクローラーまでは防げません。反映まで検索エンジン側で数日〜数週間かかることがあります。
+   */
+  allowSearchEngines?: boolean | null;
+  /**
    * 商店街メンバー向けの内部イベント(公開サイトには表示されません)。詳細はDiscordで運用するため、ここでは管理画面カレンダーに出す日付とタイトルだけを登録します。
    */
   fcEvents?:
@@ -727,6 +731,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   storeTitleTemplate?: T;
   siteDescription?: T;
   ogImage?: T;
+  allowSearchEngines?: T;
   fcEvents?:
     | T
     | {
