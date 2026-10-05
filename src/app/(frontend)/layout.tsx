@@ -15,6 +15,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: { default: settings.mallName, template: `%s « ${settings.mallName}` },
     description: settings.siteDescription,
+    // 検索エンジン許可がオフの間は全ページにnoindexを付ける(robots.txtと合わせた二重の意思表示)
+    robots: settings.allowSearchEngines ? undefined : { index: false, follow: false },
   }
 }
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

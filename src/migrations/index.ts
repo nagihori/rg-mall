@@ -19,6 +19,7 @@ import * as migration_20260909_230127_site_settings_header_footer_images from '.
 import * as migration_20260909_231151_mall_calendar_fc_events from './20260909_231151_mall_calendar_fc_events';
 import * as migration_20260921_073443_meta_title_templates from './20260921_073443_meta_title_templates';
 import * as migration_20260921_081525_meta_og_image from './20260921_081525_meta_og_image';
+import * as migration_20260921_154650_add_allow_search_engines from './20260921_154650_add_allow_search_engines';
 
 export const migrations = [
   {
@@ -124,6 +125,11 @@ export const migrations = [
   {
     up: migration_20260921_081525_meta_og_image.up,
     down: migration_20260921_081525_meta_og_image.down,
-    name: '20260921_081525_meta_og_image'
+    name: '20260921_081525_meta_og_image',
+  },
+  {
+    up: migration_20260921_154650_add_allow_search_engines.up,
+    down: migration_20260921_154650_add_allow_search_engines.down,
+    name: '20260921_154650_add_allow_search_engines'
   },
 ];
