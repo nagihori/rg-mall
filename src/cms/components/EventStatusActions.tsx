@@ -9,8 +9,9 @@ type Role = 'admin' | 'editor' | 'reviewer'
 
 const pipeline: EventStatus[] = ['draft', 'in_review', 'published', 'archived']
 const editConfirmModalSlug = 'event-status-edit-confirm'
+const unarchiveConfirmModalSlug = 'event-status-unarchive-confirm'
 
-type Action = { key: string; to: EventStatus; label: string; description: string; requiresReview?: boolean; requiresConfirm?: boolean; style?: 'primary' | 'secondary' }
+type Action = { key: string; to: EventStatus; label: string; description: string; requiresReview?: boolean; confirmModalSlug?: string; style?: 'primary' | 'secondary' }
 
 // ステータスを変えずに下書きの内容だけ保存する操作。下書き以外は本文が編集できない
 // (公開中はreadOnly)か、他の遷移ボタンが実質保存を兼ねるため、下書きのときだけ出す。
@@ -36,12 +37,16 @@ function actionsFor(status: EventStatus, role: Role): Action[] {
       return [
         // 表示中の内容は直接編集できない設計のため、「編集する」＝一旦下書きに戻す、という意味を持つ。
         // 押した瞬間サイトから見えなくなる（押し間違えると即非表示）ので、これだけ確認を挟む。
-        { key: 'draft', to: 'draft', label: '編集する', description: '下書きに戻して編集できるようにします（サイトからは見えなくなります）', requiresConfirm: true },
+        { key: 'draft', to: 'draft', label: '編集する', description: '下書きに戻して編集できるようにします（サイトからは見えなくなります）', confirmModalSlug: editConfirmModalSlug },
         { key: 'archived', to: 'archived', label: '過去のイベントに移動する', description: '終了したイベントとして扱います（サイトには引き続き表示されます）', style: 'secondary' },
       ]
     case 'archived':
-      // 内容は変わらないまま表示場所を戻すだけなので、公開と同じ「確認者/管理者のみ」の扱いにする。
-      return [{ key: 'published', to: 'published', label: 'トップページに表示する', description: '過去のイベントからトップページ表示に戻します', requiresReview: true }]
+      // どちらも公開状態を変える操作なので、公開と同じ「確認者/管理者のみ」の扱いにする。
+      // 下書きへ戻す方は公開をやり直さずにサイトから外せるが、押した瞬間に見えなくなるため確認を挟む。
+      return [
+        { key: 'published', to: 'published', label: 'トップページに表示する', description: '過去のイベントからトップページ表示に戻します', requiresReview: true },
+        { key: 'draft', to: 'draft', label: '下書きに戻す', description: '公開せずに下書きへ戻します（サイトからは見えなくなります）', requiresReview: true, confirmModalSlug: unarchiveConfirmModalSlug, style: 'secondary' },
+      ]
   }
 }
 
@@ -125,6 +130,14 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
         cancelLabel="キャンセル"
         onConfirm={() => handleClick('draft')}
       />
+      <ConfirmationModal
+        modalSlug={unarchiveConfirmModalSlug}
+        heading="下書きに戻しますか？"
+        body="過去のイベントを下書きに戻します。この瞬間からサイトには表示されなくなります。よろしいですか？"
+        confirmLabel="下書きに戻す"
+        cancelLabel="キャンセル"
+        onConfirm={() => handleClick('draft')}
+      />
       <div className="event-status-actions__panel">
         <div style={{ marginBottom: '0.5rem', fontWeight: 600 }}>公開ワークフロー</div>
         <div className="event-status-actions__pipeline">
@@ -157,7 +170,7 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
             key={action.key}
             buttonStyle={action.style ?? 'primary'}
             size="small"
-            onClick={() => (action.requiresConfirm ? toggleModal(editConfirmModalSlug) : handleClick(action.to))}
+            onClick={() => (action.confirmModalSlug ? toggleModal(action.confirmModalSlug) : handleClick(action.to))}
             tooltip={action.description}
           >
             {action.label}
