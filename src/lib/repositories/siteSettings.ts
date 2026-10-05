@@ -31,6 +31,7 @@ export type SiteSettingsViewModel = {
   ogImageUrl: string | null
   ogImageWidth: number | null
   ogImageHeight: number | null
+  allowSearchEngines: boolean
 }
 
 function toImageUrl(media: unknown): string | null {
@@ -69,6 +70,7 @@ export const getSiteSettings = cache(async (): Promise<SiteSettingsViewModel> =>
     ogImageUrl: toImageUrl(doc.ogImage) ?? toImageUrl(doc.headerImage),
     ogImageWidth: toImageDim(doc.ogImage, 'width') ?? toImageDim(doc.headerImage, 'width'),
     ogImageHeight: toImageDim(doc.ogImage, 'height') ?? toImageDim(doc.headerImage, 'height'),
+    allowSearchEngines: doc.allowSearchEngines ?? true,
   }
 })
 // 管理画面カレンダー用。FC内部イベント(日付・タイトル・任意の外部リンクのみ)をエントリ化する。
