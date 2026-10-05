@@ -68,7 +68,8 @@ export const Events: CollectionConfig = {
       // 変更のたびに公開ページのキャッシュを破棄する(頻度が低いぶん取りこぼしの方が困るため)。
       revalidatePublicEventPaths(doc.slug)
       if (doc.status === previousDoc?.status) return doc
-      const action = doc.status === 'published' ? 'published' : doc.status === 'archived' ? 'archived' : doc.status === 'draft' && previousDoc?.status === 'in_review' ? 'returned_to_draft' : null
+      // 確認待ち・過去のイベントのどちらから戻した場合も「下書きに戻す」として記録する。
+      const action = doc.status === 'published' ? 'published' : doc.status === 'archived' ? 'archived' : doc.status === 'draft' && (previousDoc?.status === 'in_review' || previousDoc?.status === 'archived') ? 'returned_to_draft' : null
       if (action) await recordEventTransition(req, doc.id, action)
       const editUrl = `${process.env.NEXT_PUBLIC_APP_URL}/admin/collections/events/${doc.id}`
       const previewUrl = `${process.env.NEXT_PUBLIC_APP_URL}/events/preview/${doc.id}`

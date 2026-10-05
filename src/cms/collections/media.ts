@@ -1,8 +1,10 @@
 import type { CollectionConfig } from 'payload'
-import { canEdit, isAdmin } from '../access'
+import { APIError } from 'payload'
+import { canDeleteOwnMedia, canEdit } from '../access'
+import { findMediaUsages } from '@/lib/repositories/mediaUsage'
 
 export const Media: CollectionConfig = {
-  slug: 'media', labels: { singular: 'メディア', plural: 'メディア' }, access: { read: canEdit, create: canEdit, update: canEdit, delete: isAdmin },
+  slug: 'media', labels: { singular: 'メディア', plural: 'メディア' }, access: { read: canEdit, create: canEdit, update: canEdit, delete: canDeleteOwnMedia },
   admin: {
     defaultColumns: ['filename', 'alt', 'uploadedBy', 'updatedAt'],
     components: {
@@ -32,6 +34,11 @@ export const Media: CollectionConfig = {
     beforeChange: [({ data, operation, req }) => {
       if (operation === 'create' && !data?.uploadedBy) data.uploadedBy = req.user?.id
       return data
+    }],
+    beforeDelete: [async ({ id, req }) => {
+      // 一覧の一括削除でも1件ずつここを通る。使用中なら理由を挙げて止める(外部キーはSET NULLで黙って画像が消えるため)。
+      const usages = await findMediaUsages(req.payload, id)
+      if (usages.length > 0) throw new APIError(`このメディアは使用中のため削除できません: ${usages.join('、')}。先に差し替えるか外してください。`, 400)
     }],
   },
   fields: [
