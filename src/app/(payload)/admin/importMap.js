@@ -30,6 +30,7 @@ import { default as default_aa8cb021a5808b06589bdd9eb5263912 } from '../../../..
 import { default as default_867b02c2a4abc2c081fd26e0d6db3a82 } from '../../../../src/cms/components/MediaListDefaultFilter.tsx'
 import { default as default_aa9f988258e125f413a00eeb05e80207 } from '../../../../src/cms/components/AutoCloseMediaDrawerButton.tsx'
 import { default as default_d1906b3d7cb0161c0f5e9ab7f874f7b8 } from '../../../../src/cms/components/AutoResizeUploadControl.tsx'
+import { default as default_5786b744cd2ac83915a8bde47006d746 } from '../../../../src/cms/components/LogoutLink.tsx'
 import { default as default_9bc91f63bd53f753072b3a83c55460be } from '../../../../src/cms/components/DashboardMallCalendar.tsx'
 import { default as default_38da05dcd2e2f5cc44d568855002a48f } from '../../../../src/cms/components/DiscordLoginButton.tsx'
 import { default as default_321bfe0dc67912fc52ab65ae94a2c390 } from '../../../../src/cms/components/AdminFont.tsx'
@@ -70,6 +71,7 @@ export const importMap = {
   "./src/cms/components/MediaListDefaultFilter.tsx#default": default_867b02c2a4abc2c081fd26e0d6db3a82,
   "./src/cms/components/AutoCloseMediaDrawerButton.tsx#default": default_aa9f988258e125f413a00eeb05e80207,
   "./src/cms/components/AutoResizeUploadControl.tsx#default": default_d1906b3d7cb0161c0f5e9ab7f874f7b8,
+  "./src/cms/components/LogoutLink.tsx#default": default_5786b744cd2ac83915a8bde47006d746,
   "./src/cms/components/DashboardMallCalendar.tsx#default": default_9bc91f63bd53f753072b3a83c55460be,
   "./src/cms/components/DiscordLoginButton.tsx#default": default_38da05dcd2e2f5cc44d568855002a48f,
   "./src/cms/components/AdminFont.tsx#default": default_321bfe0dc67912fc52ab65ae94a2c390,

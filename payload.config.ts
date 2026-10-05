@@ -30,6 +30,7 @@ export default buildConfig({
     components: {
       beforeLogin: ['./src/cms/components/DiscordLoginButton.tsx'],
       providers: ['./src/cms/components/AdminFont.tsx'],
+      actions: ['./src/cms/components/LogoutLink.tsx'],
       afterDashboard: ['./src/cms/components/DashboardMallCalendar.tsx'],
     },
   },
