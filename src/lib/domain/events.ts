@@ -7,11 +7,14 @@ export type EventCategory = 'ongoing' | 'upcoming' | 'new' | 'archive'
 export const eventStatusLabels: Record<EventStatus, string> = { draft: '下書き', in_review: '確認待ち', published: 'トップページに表示中', archived: '過去のイベント' }
 
 const transitions: Record<EventStatus, readonly EventStatus[]> = {
-  draft: ['in_review'], in_review: ['draft', 'published'], published: ['draft', 'archived'], archived: ['published'],
+  draft: ['in_review'], in_review: ['draft', 'published'], published: ['draft', 'archived'], archived: ['published', 'draft'],
 }
 export function canTransition(from: EventStatus, to: EventStatus, role: 'editor' | 'reviewer' | 'admin') {
   if (!transitions[from].includes(to)) return false
-  return !(to === 'published' && role === 'editor')
+  if (to === 'published' && role === 'editor') return false
+  // 過去のイベント→下書きは、公開済みの記事をサイトから外す操作なので確認者/管理者のみ(公開と同じ扱い)。
+  if (from === 'archived' && to === 'draft' && role === 'editor') return false
+  return true
 }
 export function assertTransition(from: EventStatus, to: EventStatus, role: 'editor' | 'reviewer' | 'admin') {
   if (!canTransition(from, to, role)) throw new Error(`Invalid event transition: ${from} -> ${to}`)
