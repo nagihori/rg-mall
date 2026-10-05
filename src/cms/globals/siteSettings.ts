@@ -103,6 +103,15 @@ export const SiteSettings: GlobalConfig = {
               name: 'ogImage', type: 'relationship', relationTo: 'media', label: 'OGP画像(トップページ)',
               admin: { description: 'SNS等でトップページのリンクを共有した際に表示される画像。未設定の場合はヘッダー画像を使用します' },
             },
+            {
+              name: 'allowSearchEngines', type: 'checkbox', label: '検索エンジンにサイトの情報取得(クロール)を許可する', defaultValue: true,
+              admin: {
+                description: 'オンの場合、Google等の検索エンジンがサイトを巡回し、検索結果に表示されることがあります。'
+                  + 'オフにすると、robots.txt と各ページのnoindex指定で巡回・検索結果への掲載を控えるよう求めます(公開直前の調整中などに便利です)。'
+                  + 'ただしこれは「お願い」であり、URLを知っている人がアクセスすることや、従わないクローラーまでは防げません。'
+                  + '反映まで検索エンジン側で数日〜数週間かかることがあります。',
+              },
+            },
           ],
         },
         {
