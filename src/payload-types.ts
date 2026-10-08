@@ -639,6 +639,10 @@ export interface SiteSetting {
    * 未設定の場合は既定の画像を使用します
    */
   footerImage?: (number | null) | Media;
+  /**
+   * フッター画像の下の帯に表示します。空欄にすると既定の表記に戻ります
+   */
+  copyright?: string | null;
   mallName: string;
   server?: string | null;
   location?: string | null;
@@ -717,6 +721,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   headerImage?: T;
   tagline?: T;
   footerImage?: T;
+  copyright?: T;
   mallName?: T;
   server?: T;
   location?: T;

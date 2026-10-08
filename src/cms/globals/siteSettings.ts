@@ -3,6 +3,7 @@ import { canEdit } from '../access'
 import { sortFcEventsByDate } from '@/lib/presenters/fcEvent'
 import { revalidatePublicSitePaths } from '@/lib/cache/revalidateSiteSettings'
 import {
+  DEFAULT_COPYRIGHT,
   DEFAULT_HOME_TITLE_TEMPLATE,
   DEFAULT_EVENT_TITLE_TEMPLATE,
   DEFAULT_STORE_TITLE_TEMPLATE,
@@ -40,6 +41,10 @@ export const SiteSettings: GlobalConfig = {
           label: 'フッター',
           fields: [
             { name: 'footerImage', type: 'relationship', relationTo: 'media', label: 'フッター背景画像', admin: { description: '未設定の場合は既定の画像を使用します' } },
+            {
+              name: 'copyright', type: 'text', label: 'コピーライト', maxLength: 120, defaultValue: DEFAULT_COPYRIGHT,
+              admin: { description: 'フッター画像の下の帯に表示します。空欄にすると既定の表記に戻ります' },
+            },
             { name: 'mallName', type: 'text', label: '商店街名', required: true, maxLength: 60 },
             { name: 'server', type: 'text', label: 'サーバー', maxLength: 60 },
             { name: 'location', type: 'text', label: '所在地', maxLength: 120 },

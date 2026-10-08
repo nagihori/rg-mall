@@ -4,6 +4,7 @@ import config from '@payload-config'
 import {
   SITE_NAME,
   SITE_DESCRIPTION,
+  DEFAULT_COPYRIGHT,
   DEFAULT_HOME_TITLE_TEMPLATE,
   DEFAULT_EVENT_TITLE_TEMPLATE,
   DEFAULT_STORE_TITLE_TEMPLATE,
@@ -24,6 +25,7 @@ export type SiteSettingsViewModel = {
   tagline: string
   footerImageUrl: string | null
   footerImageAlt: string
+  copyright: string
   homeTitleTemplate: string
   eventTitleTemplate: string
   storeTitleTemplate: string
@@ -63,6 +65,7 @@ export const getSiteSettings = cache(async (): Promise<SiteSettingsViewModel> =>
     tagline: doc.tagline || SITE_DESCRIPTION,
     footerImageUrl: toImageUrl(doc.footerImage),
     footerImageAlt: toImageAlt(doc.footerImage),
+    copyright: doc.copyright?.trim() || DEFAULT_COPYRIGHT,
     homeTitleTemplate: doc.homeTitleTemplate || DEFAULT_HOME_TITLE_TEMPLATE,
     eventTitleTemplate: doc.eventTitleTemplate || DEFAULT_EVENT_TITLE_TEMPLATE,
     storeTitleTemplate: doc.storeTitleTemplate || DEFAULT_STORE_TITLE_TEMPLATE,
