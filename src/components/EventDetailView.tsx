@@ -1,5 +1,6 @@
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
+import { richTextConverters } from '@/lib/presenters/richTextLink'
 import type { EventCardViewModel, EventDetailViewModel } from '@/lib/presenters/event'
 import { EventRibbon } from '@/components/EventRibbon'
 import { EventGallery } from '@/components/EventGallery'
@@ -43,7 +44,7 @@ export function EventDetailView({ event, previewLabel, adjacent }: { event: Even
             </dl>
           </div>
         </div>
-        {event.body ? <div className="prose"><RichText data={event.body as SerializedEditorState} /></div> : null}
+        {event.body ? <div className="prose"><RichText converters={richTextConverters} data={event.body as SerializedEditorState} /></div> : null}
         <EventGallery images={event.gallery} indexOffset={galleryOffset} />
         {adjacent && <EventPagination prev={adjacent.prev} next={adjacent.next} />}
       </article>
