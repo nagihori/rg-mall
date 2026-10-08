@@ -481,3 +481,7 @@ body,
 .admin-env-badge--production { background: #c0392b; }
 .admin-env-badge--staging { background: #d68910; }
 .admin-env-badge--development { background: #2e86c1; }
+
+/* パンくずのホームはPayload側で18px四方に固定されているため、ファビコン+商店街名が収まるよう解除する。 */
+.step-nav__home { width: auto !important; height: auto !important; }
+.admin-site-title--crumb svg, .admin-site-title__icon { flex: none; width: 18px; height: 18px; object-fit: contain; }
