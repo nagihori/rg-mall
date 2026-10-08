@@ -14,6 +14,7 @@ import {
 export const SiteSettings: GlobalConfig = {
   slug: 'siteSettings',
   label: '商店街設定',
+  admin: { components: { elements: { beforeDocumentControls: ['./src/cms/components/ProcessingOverlay.tsx'] } } },
   access: { read: () => true, update: canEdit },
   hooks: {
     // FCイベントは保存時に日付の古い順へ並べ替える(管理画面の一覧を常に時系列にする)

@@ -170,6 +170,9 @@ export interface Event {
   } | null;
   heroImage?: (number | null) | Media;
   galleryImages?: (number | Media)[] | null;
+  /**
+   * レビュー依頼までに必須です（未設定だとトップページに正しく表示されません）
+   */
   startsAt?: string | null;
   endsAt?: string | null;
   /**
