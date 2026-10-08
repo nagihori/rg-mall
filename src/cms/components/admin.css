@@ -458,3 +458,26 @@ body,
   text-decoration: none;
 }
 .admin-public-site-nav-link:hover { opacity: 0.85; }
+
+/* 商店街名と環境バッジ(サイドメニュー最上部・パンくずのホーム)。環境の取り違え防止が目的なので本番と他を色で分ける。 */
+.admin-site-title {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--base) / 2);
+  margin-bottom: calc(var(--base) / 2);
+  color: var(--theme-elevation-800);
+  font-weight: 600;
+}
+.admin-site-title--crumb { display: inline-flex; margin-bottom: 0; font-size: 0.875rem; }
+.admin-env-badge {
+  padding: 0 calc(var(--base) / 3);
+  border-radius: 3px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.6;
+  color: #fff;
+  white-space: nowrap;
+}
+.admin-env-badge--production { background: #c0392b; }
+.admin-env-badge--staging { background: #d68910; }
+.admin-env-badge--development { background: #2e86c1; }
