@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { canTransition, classifyEvent, isRepublish, shouldNotifyReviewRequest } from './events'
+import { canTransition, classifyEvent, isContentEditable, isRepublish, shouldNotifyReviewRequest } from './events'
 describe('event state transitions', () => {
   it('allows only reviewers to publish', () => {
     expect(canTransition('in_review', 'published', 'editor')).toBe(false)
@@ -34,5 +34,15 @@ describe('discord notification rules', () => {
     expect(isRepublish({ publishedAt: '2026-10-01T00:00:00Z' })).toBe(true)
     expect(isRepublish({ publishedAt: null })).toBe(false)
     expect(isRepublish(undefined)).toBe(false)
+  })
+})
+
+describe('content editability', () => {
+  it('allows editing only while drafting', () => {
+    expect(isContentEditable(undefined)).toBe(true)
+    expect(isContentEditable('draft')).toBe(true)
+    expect(isContentEditable('in_review')).toBe(false)
+    expect(isContentEditable('published')).toBe(false)
+    expect(isContentEditable('archived')).toBe(false)
   })
 })
