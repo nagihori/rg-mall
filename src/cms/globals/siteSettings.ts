@@ -110,6 +110,10 @@ export const SiteSettings: GlobalConfig = {
               admin: { description: 'SNS等でトップページのリンクを共有した際に表示される画像。未設定の場合はヘッダー画像を使用します' },
             },
             {
+              name: 'favicon', type: 'relationship', relationTo: 'media', label: 'ファビコン',
+              admin: { description: 'ブラウザのタブや管理画面のパンくずに表示される正方形の画像（推奨: 512×512px以上）。未設定の場合、公開サイトは既定のまま、管理画面はPayloadのアイコンを表示します' },
+            },
+            {
               name: 'allowSearchEngines', type: 'checkbox', label: '検索エンジンにサイトの情報取得(クロール)を許可する', defaultValue: true,
               admin: {
                 description: 'オンの場合、Google等の検索エンジンがサイトを巡回し、検索結果に表示されることがあります。'

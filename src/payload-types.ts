@@ -685,6 +685,10 @@ export interface SiteSetting {
    */
   ogImage?: (number | null) | Media;
   /**
+   * ブラウザのタブや管理画面のパンくずに表示される正方形の画像（推奨: 512×512px以上）。未設定の場合、公開サイトは既定のまま、管理画面はPayloadのアイコンを表示します
+   */
+  favicon?: (number | null) | Media;
+  /**
    * オンの場合、Google等の検索エンジンがサイトを巡回し、検索結果に表示されることがあります。オフにすると、robots.txt と各ページのnoindex指定で巡回・検索結果への掲載を控えるよう求めます(公開直前の調整中などに便利です)。ただしこれは「お願い」であり、URLを知っている人がアクセスすることや、従わないクローラーまでは防げません。反映まで検索エンジン側で数日〜数週間かかることがあります。
    */
   allowSearchEngines?: boolean | null;
@@ -739,6 +743,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   storeTitleTemplate?: T;
   siteDescription?: T;
   ogImage?: T;
+  favicon?: T;
   allowSearchEngines?: T;
   fcEvents?:
     | T
