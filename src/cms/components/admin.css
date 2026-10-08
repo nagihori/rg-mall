@@ -444,3 +444,17 @@ body,
 @media (prefers-reduced-motion: reduce) {
   .processing-overlay__spinner { animation-duration: 3s; }
 }
+
+/* サイドメニュー最上部の公開サイトへのリンク。 */
+.admin-public-site-nav-link {
+  display: block;
+  margin-bottom: var(--base);
+  padding: calc(var(--base) / 2) var(--base);
+  border-radius: 4px;
+  background: var(--theme-elevation-800);
+  color: var(--theme-elevation-0);
+  font-size: 0.875rem;
+  text-align: center;
+  text-decoration: none;
+}
+.admin-public-site-nav-link:hover { opacity: 0.85; }

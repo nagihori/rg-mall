@@ -36,6 +36,7 @@ import { default as default_799bd01eb3137dfbcaed9e1f7071209c } from '../../../..
 import { default as default_5786b744cd2ac83915a8bde47006d746 } from '../../../../src/cms/components/LogoutLink.tsx'
 import { default as default_9bc91f63bd53f753072b3a83c55460be } from '../../../../src/cms/components/DashboardMallCalendar.tsx'
 import { default as default_38da05dcd2e2f5cc44d568855002a48f } from '../../../../src/cms/components/DiscordLoginButton.tsx'
+import { default as default_02fb9dac042e611cd55de0cbd24abe72 } from '../../../../src/cms/components/PublicSiteNavLink.tsx'
 import { default as default_321bfe0dc67912fc52ab65ae94a2c390 } from '../../../../src/cms/components/AdminFont.tsx'
 import { VercelBlobClientUploadHandler as VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e } from '@payloadcms/storage-vercel-blob/client'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
@@ -80,6 +81,7 @@ export const importMap = {
   "./src/cms/components/LogoutLink.tsx#default": default_5786b744cd2ac83915a8bde47006d746,
   "./src/cms/components/DashboardMallCalendar.tsx#default": default_9bc91f63bd53f753072b3a83c55460be,
   "./src/cms/components/DiscordLoginButton.tsx#default": default_38da05dcd2e2f5cc44d568855002a48f,
+  "./src/cms/components/PublicSiteNavLink.tsx#default": default_02fb9dac042e611cd55de0cbd24abe72,
   "./src/cms/components/AdminFont.tsx#default": default_321bfe0dc67912fc52ab65ae94a2c390,
   "@payloadcms/storage-vercel-blob/client#VercelBlobClientUploadHandler": VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
