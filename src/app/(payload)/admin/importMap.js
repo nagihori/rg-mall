@@ -32,10 +32,12 @@ import { default as default_aa8cb021a5808b06589bdd9eb5263912 } from '../../../..
 import { default as default_867b02c2a4abc2c081fd26e0d6db3a82 } from '../../../../src/cms/components/MediaListDefaultFilter.tsx'
 import { default as default_aa9f988258e125f413a00eeb05e80207 } from '../../../../src/cms/components/AutoCloseMediaDrawerButton.tsx'
 import { default as default_d1906b3d7cb0161c0f5e9ab7f874f7b8 } from '../../../../src/cms/components/AutoResizeUploadControl.tsx'
+import { SiteTitleIcon as SiteTitleIcon_71eafbad03c84fff2b3510cf2d6d224f } from '../../../../src/cms/components/SiteTitle.tsx'
 import { default as default_799bd01eb3137dfbcaed9e1f7071209c } from '../../../../src/cms/components/PublicSiteLink.tsx'
 import { default as default_5786b744cd2ac83915a8bde47006d746 } from '../../../../src/cms/components/LogoutLink.tsx'
 import { default as default_9bc91f63bd53f753072b3a83c55460be } from '../../../../src/cms/components/DashboardMallCalendar.tsx'
 import { default as default_38da05dcd2e2f5cc44d568855002a48f } from '../../../../src/cms/components/DiscordLoginButton.tsx'
+import { SiteTitle as SiteTitle_71eafbad03c84fff2b3510cf2d6d224f } from '../../../../src/cms/components/SiteTitle.tsx'
 import { default as default_02fb9dac042e611cd55de0cbd24abe72 } from '../../../../src/cms/components/PublicSiteNavLink.tsx'
 import { default as default_321bfe0dc67912fc52ab65ae94a2c390 } from '../../../../src/cms/components/AdminFont.tsx'
 import { VercelBlobClientUploadHandler as VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e } from '@payloadcms/storage-vercel-blob/client'
@@ -77,10 +79,12 @@ export const importMap = {
   "./src/cms/components/MediaListDefaultFilter.tsx#default": default_867b02c2a4abc2c081fd26e0d6db3a82,
   "./src/cms/components/AutoCloseMediaDrawerButton.tsx#default": default_aa9f988258e125f413a00eeb05e80207,
   "./src/cms/components/AutoResizeUploadControl.tsx#default": default_d1906b3d7cb0161c0f5e9ab7f874f7b8,
+  "./src/cms/components/SiteTitle.tsx#SiteTitleIcon": SiteTitleIcon_71eafbad03c84fff2b3510cf2d6d224f,
   "./src/cms/components/PublicSiteLink.tsx#default": default_799bd01eb3137dfbcaed9e1f7071209c,
   "./src/cms/components/LogoutLink.tsx#default": default_5786b744cd2ac83915a8bde47006d746,
   "./src/cms/components/DashboardMallCalendar.tsx#default": default_9bc91f63bd53f753072b3a83c55460be,
   "./src/cms/components/DiscordLoginButton.tsx#default": default_38da05dcd2e2f5cc44d568855002a48f,
+  "./src/cms/components/SiteTitle.tsx#SiteTitle": SiteTitle_71eafbad03c84fff2b3510cf2d6d224f,
   "./src/cms/components/PublicSiteNavLink.tsx#default": default_02fb9dac042e611cd55de0cbd24abe72,
   "./src/cms/components/AdminFont.tsx#default": default_321bfe0dc67912fc52ab65ae94a2c390,
   "@payloadcms/storage-vercel-blob/client#VercelBlobClientUploadHandler": VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e,
