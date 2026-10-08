@@ -1,8 +1,7 @@
 'use client'
 
 import type { SelectFieldClientProps } from 'payload'
-import { useEffect, useRef, useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
 import { Button, ConfirmationModal, useAuth, useDocumentInfo, useField, useForm, useModal } from '@payloadcms/ui'
 import { ProcessingOverlay } from './ProcessingOverlay'
 import { eventStatusLabels as statusLabels, type EventStatus } from '@/lib/domain/events'
@@ -77,8 +76,6 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
   const { setModified, submit } = useForm()
   const { id, collectionSlug } = useDocumentInfo()
   const { toggleModal } = useModal()
-  const router = useRouter()
-  const [refreshing, startRefresh] = useTransition()
   const [busy, setBusy] = useState(false)
   const busyRef = useRef(false)
   const { user } = useAuth()
@@ -108,31 +105,42 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
     setBusy(true)
     const previous = currentStatus
     setValue(to)
+    let reloading = false
     try {
       await submit({ overrides: { status: to } })
       // submit() の戻り値は当てにならない（サーバーが拒否しても検知できない）ため、
-      // 保存後に実際のドキュメントを読み直してボタンの見た目を正しい状態に合わせ直す。
-      // このsetValueはあくまで表示の同期用で内容の変更ではないため、直後にmodifiedを
-      // 戻しておかないと「保存済みなのに保存されていません」警告が誤って出てしまう。
+      // 保存後に実際のドキュメントを読み直して、遷移できたかどうかを確かめる。
+      let savedStatus: EventStatus | undefined
       try {
         const res = await fetch(`/api/${collectionSlug}/${id}?depth=0`, { credentials: 'include' })
-        const doc = res.ok ? await res.json() : null
-        setValue(doc?.status ?? previous)
+        savedStatus = res.ok ? (await res.json())?.status : undefined
       } catch {
-        setValue(previous)
+        savedStatus = undefined
       }
-      // Payloadは保存直後のフォーム状態を「遷移前のステータス」で計算した編集権限で組み立てるため、
-      // 公開→下書きでは本文が編集できないまま/下書き→公開では本文が編集できてしまうことがあった。
-      // サーバー側でステータスに応じた編集権限を計算し直させるため、遷移後に画面を再取得する。
-      startRefresh(() => router.refresh())
+      if (savedStatus === to && to !== previous) {
+        // Payloadは保存直後のフォーム状態を「遷移前のステータス」で計算した編集権限で組み立てるため、
+        // 公開→下書きでは本文が編集できないまま/確認待ち→公開では本文が編集できてしまうことがあった
+        // (router.refresh()では入れ替わらない)。一覧から開き直したときと同じ状態にするため、
+        // 遷移に成功したときは画面ごと読み込み直す。読み込みが終わるまでオーバーレイは出したままにする。
+        reloading = true
+        // 「保存されていない変更があります」の離脱確認が出ないよう、先にmodifiedを戻しておく。
+        setModified(false)
+        window.location.reload()
+        return
+      }
+      // 拒否された場合は表示だけ実際の状態に戻す。このsetValueは内容の変更ではないため、
+      // 直後にmodifiedを戻しておかないと「保存済みなのに保存されていません」警告が誤って出てしまう。
+      setValue(savedStatus ?? previous)
     } finally {
-      busyRef.current = false
-      setBusy(false)
-      // setValueの内部処理が次のtickでmodifiedを再度立てることがあるため、1tick後にリセットする。
-      setTimeout(() => setModified(false), 0)
+      if (!reloading) {
+        busyRef.current = false
+        setBusy(false)
+        // setValueの内部処理が次のtickでmodifiedを再度立てることがあるため、1tick後にリセットする。
+        setTimeout(() => setModified(false), 0)
+      }
     }
   }
-  const disabled = busy || refreshing
+  const disabled = busy
 
   return (
     <>
