@@ -6,7 +6,7 @@ import { revalidatePublicStorePaths } from '@/lib/cache/revalidateStores'
 
 export const Stores: CollectionConfig = {
   slug: 'stores', labels: { singular: '所属店舗', plural: '所属店舗' },
-  admin: { useAsTitle: 'name', defaultColumns: ['name', 'owner', 'updatedAt'], components: { edit: { beforeDocumentControls: ['./src/cms/components/BackToListLink.tsx'] } } },
+  admin: { useAsTitle: 'name', defaultColumns: ['name', 'owner', 'updatedAt'], components: { edit: { beforeDocumentControls: ['./src/cms/components/BackToListLink.tsx', './src/cms/components/ProcessingOverlay.tsx'] } } },
   // レビュー承認フローは持たず、Payload標準の下書き/公開のみを使う(公開後の編集も一旦下書き版になり、
   // 「公開する」を押すまで公開ページには反映されない)。
   versions: { drafts: true, maxPerDoc: 20 },

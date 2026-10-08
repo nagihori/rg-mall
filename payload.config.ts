@@ -1,5 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { LinkFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { buildConfig } from 'payload'
 import { dirname } from 'node:path'
@@ -30,7 +30,7 @@ export default buildConfig({
     components: {
       beforeLogin: ['./src/cms/components/DiscordLoginButton.tsx'],
       providers: ['./src/cms/components/AdminFont.tsx'],
-      actions: ['./src/cms/components/LogoutLink.tsx'],
+      actions: ['./src/cms/components/PublicSiteLink.tsx', './src/cms/components/LogoutLink.tsx'],
       afterDashboard: ['./src/cms/components/DashboardMallCalendar.tsx'],
     },
   },
@@ -50,7 +50,11 @@ export default buildConfig({
       },
     },
   },
-  editor: lexicalEditor(),
+  // 本文の内部リンクは公開ページを持つコレクション(events / stores)だけに絞る。
+  // 既定のままだと media や users など公開URLを持たないものまで候補に出てしまう。
+  editor: lexicalEditor({
+    features: ({ defaultFeatures }) => defaultFeatures.map((feature) => (feature.key === 'link' ? LinkFeature({ enabledCollections: ['events', 'stores'] }) : feature)),
+  }),
   sharp,
   collections: [Users, Events, Stores, Media, AuditLogs],
   globals: [VercelUsageMonitor, SiteSettings],

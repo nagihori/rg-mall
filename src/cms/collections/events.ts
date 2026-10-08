@@ -3,7 +3,7 @@ import { APIError } from 'payload'
 import { canEdit, canReview, canTrashDraft } from '../access'
 import { normalizeSummary, normalizeTitle, numberedSlug, slugFromTitle } from '@/lib/normalize/event'
 import { eventInputSchema } from '@/lib/validate/event'
-import { canTransition, eventStatusLabels as statusLabels, eventStatuses, type EventStatus } from '@/lib/domain/events'
+import { canTransition, isRepublish, shouldNotifyReviewRequest, eventStatusLabels as statusLabels, eventStatuses, type EventStatus } from '@/lib/domain/events'
 import { recordEventTransition } from '../audit'
 import { notifyArchived, notifyPublished, notifyReturnedToDraft, notifyReviewRequested } from '@/lib/integrations/discord'
 import { revalidatePublicEventPaths } from '@/lib/cache/revalidateEvents'
@@ -12,7 +12,7 @@ import { revalidatePublicEventPaths } from '@/lib/cache/revalidateEvents'
 const dateTimeAdmin = { date: { pickerAppearance: 'dayAndTime' as const, displayFormat: 'yyyy/MM/dd HH:mm', timeFormat: 'HH:mm' } }
 
 export const Events: CollectionConfig = {
-  slug: 'events', labels: { singular: 'イベント', plural: 'イベント' }, admin: { useAsTitle: 'title', defaultColumns: ['title', 'status', 'createdByUsername', 'reviewRequestedByUsername', 'updatedAt'], components: { edit: { beforeDocumentControls: ['./src/cms/components/BackToListLink.tsx'], Status: './src/cms/components/EventStatusBadge.tsx' }, beforeList: ['./src/cms/components/EventListFilters.tsx', './src/cms/components/EventDeleteGuardBanner.tsx'] } }, versions: { drafts: true, maxPerDoc: 20 }, trash: true,
+  slug: 'events', labels: { singular: 'イベント', plural: 'イベント' }, admin: { useAsTitle: 'title', defaultColumns: ['title', 'status', 'createdByUsername', 'reviewRequestedByUsername', 'updatedAt'], components: { edit: { beforeDocumentControls: ['./src/cms/components/BackToListLink.tsx', './src/cms/components/ProcessingOverlay.tsx'], Status: './src/cms/components/EventStatusBadge.tsx' }, beforeList: ['./src/cms/components/EventListFilters.tsx', './src/cms/components/EventDeleteGuardBanner.tsx'] } }, versions: { drafts: true, maxPerDoc: 20 }, trash: true,
   access: { read: canEdit, create: canEdit, update: canEdit, delete: canTrashDraft },
   hooks: {
     beforeValidate: [async ({ data, operation, req }) => {
@@ -76,11 +76,14 @@ export const Events: CollectionConfig = {
       const requester = req.user?.discordUsername ?? '不明なユーザー'
       try {
         if (doc.status === 'in_review' && previousDoc?.status === 'draft') {
-          await notifyReviewRequested({ eventTitle: doc.title, requester, reviewUrl: editUrl, previewUrl })
+          // 確認者/管理者が自分で依頼した場合は、通知しても自分宛てになるだけなので送らない。
+          if (shouldNotifyReviewRequest(req.user?.role)) await notifyReviewRequested({ eventTitle: doc.title, requester, reviewUrl: editUrl, previewUrl })
         } else if (doc.status === 'draft' && previousDoc?.status === 'in_review' && req.user?.role !== 'editor') {
           // 編集者自身が確認依頼を取り下げた場合は通知不要。確認者/管理者が差し戻した場合のみ編集者へ知らせる。
           await notifyReturnedToDraft({ eventTitle: doc.title, reviewer: requester, editUrl, authorDiscordId: doc.createdByDiscordId })
-        } else if (doc.status === 'published') {
+        } else if (doc.status === 'published' && !isRepublish(previousDoc)) {
+          // 再公開(一度公開したものを下書きへ戻して再度公開/過去のイベントから戻した場合)は通知しない。
+          // publishedAtはbeforeChangeで毎回上書きされるが、previousDocは更新前の値なので初回公開かどうかを判別できる。
           const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL}/events/${doc.slug}`
           const author = doc.createdByUsername ?? requester
           // Discordが通知内リンクを踏んだ直後にOGPを取りに来た際、その回だけコールドスタート等で
@@ -144,7 +147,9 @@ export const Events: CollectionConfig = {
     { name: 'body', type: 'richText', label: '本文', access: { update: ({ data }) => data?.status !== 'published' } },
     { name: 'heroImage', type: 'relationship', label: 'メイン画像', relationTo: 'media', access: { update: ({ data }) => data?.status !== 'published' } },
     { name: 'galleryImages', type: 'relationship', label: 'ギャラリー画像', relationTo: 'media', hasMany: true, access: { update: ({ data }) => data?.status !== 'published' } },
-    { name: 'startsAt', type: 'date', label: '開始日時', admin: { position: 'sidebar', ...dateTimeAdmin }, access: { update: ({ data }) => data?.status !== 'published' } },
+    // 公開ページへのリンク(公開中/過去のイベントは公開URL、それ以外はプレビュー)。開始日時の上に置いて目に入りやすくする。
+    { name: 'publicLink', type: 'ui', admin: { position: 'sidebar', components: { Field: './src/cms/components/EventPublicLink.tsx' } } },
+    { name: 'startsAt', type: 'date', label: '開始日時', admin: { position: 'sidebar', description: 'レビュー依頼までに必須です（未設定だとトップページに正しく表示されません）', ...dateTimeAdmin }, access: { update: ({ data }) => data?.status !== 'published' } },
     { name: 'endsAt', type: 'date', label: '終了日時', admin: { position: 'sidebar', ...dateTimeAdmin }, access: { update: ({ data }) => data?.status !== 'published' } },
     { name: 'location', type: 'text', label: '場所', admin: { position: 'sidebar', description: '開催場所（自由入力）' }, access: { update: ({ data }) => data?.status !== 'published' } },
     { name: 'showOnMallCalendar', type: 'checkbox', label: 'カレンダーに表示', defaultValue: false, admin: { position: 'sidebar', description: '商店街全体のイベントとして、トップページの「商店街スケジュール」カレンダーに開始日〜終了日を表示します。' }, access: { update: ({ data }) => data?.status !== 'published' } },
