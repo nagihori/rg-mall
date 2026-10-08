@@ -1,5 +1,6 @@
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
+import { richTextConverters } from '@/lib/presenters/richTextLink'
 import type { StoreDetailViewModel } from '@/lib/presenters/store'
 import { EventGallery } from '@/components/EventGallery'
 import { BackToTopBar } from '@/components/BackToTopBar'
@@ -76,7 +77,7 @@ export function StoreDetailView({ store }: { store: StoreDetailViewModel }) {
               </dl>
             </div>
           </div>
-          {store.body ? <div className="prose"><RichText data={store.body as SerializedEditorState} /></div> : null}
+          {store.body ? <div className="prose"><RichText converters={richTextConverters} data={store.body as SerializedEditorState} /></div> : null}
           {store.gallery.length > 0 && (
             <section>
               <h2>ギャラリー</h2>
