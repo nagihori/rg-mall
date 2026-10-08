@@ -111,7 +111,7 @@ export const SiteSettings: GlobalConfig = {
             },
             {
               name: 'favicon', type: 'relationship', relationTo: 'media', label: 'ファビコン',
-              admin: { description: 'ブラウザのタブや管理画面のパンくずに表示される正方形の画像（推奨: 512×512px以上）。未設定の場合、公開サイトは既定のまま、管理画面はPayloadのアイコンを表示します' },
+              admin: { description: 'ブラウザのタブや管理画面のパンくずに表示される正方形の画像（推奨: 512×512px以上）。未設定の場合、公開サイトは未設定のまま、管理画面はPayloadのアイコンを表示します' },
             },
             {
               name: 'allowSearchEngines', type: 'checkbox', label: '検索エンジンにサイトの情報取得(クロール)を許可する', defaultValue: true,
