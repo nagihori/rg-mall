@@ -1,4 +1,5 @@
 export const SITE_NAME = 'ルーガンド商会 商店街'
+export const DEFAULT_COPYRIGHT = '(C)Rugand Co. / (C)Square Enix'
 export const SITE_DESCRIPTION = 'FC「ルーガンド商会」のイベントお知らせページ'
 
 // 管理画面のメタ情報タブで編集できるtitleテンプレートの既定値。{{site_title}}等の変数は renderMetaTemplate で置換する
