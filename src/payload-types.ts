@@ -136,6 +136,9 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   discordId: string;
+  /**
+   * 管理画面・Discord通知・記事の作成者として表示される名前です。初回ログイン時はDiscordのユーザー名が入りますが、以降Discordとは連動しません。
+   */
   discordUsername: string;
   role: 'pending' | 'editor' | 'reviewer' | 'admin';
   updatedAt: string;
