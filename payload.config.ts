@@ -87,6 +87,10 @@ export default buildConfig({
   db: postgresAdapter({
     pool: { connectionString: databaseURL },
     migrationDir: './src/migrations',
+    // devモードの既定ではスキーマの変更がDBへ自動で直接反映(push)され、マイグレーションの履歴とズレて
+    // 後のpayload migrateが衝突・停止する原因になっていた(誤って本番URLを向けて起動した場合は本番まで書き換わる)。
+    // スキーマ変更は必ずマイグレーション経由にするため無効にする。
+    push: false,
   }),
   typescript: { outputFile: './src/payload-types.ts' },
 })
