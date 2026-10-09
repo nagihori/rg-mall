@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { JWTAuthentication } from 'payload'
 import { isAdmin } from '../access'
 import { recordRoleChange } from '../audit'
+import { syncEventUserNames } from '../eventUserNames'
 import { notifyUserApproved } from '@/lib/integrations/discord'
 
 export const Users: CollectionConfig = { slug: 'users', labels: { singular: 'ユーザー', plural: 'ユーザー' }, auth: { disableLocalStrategy: true, useSessions: false, strategies: [{ name: 'local-jwt', authenticate: JWTAuthentication }] }, admin: { useAsTitle: 'discordUsername', defaultColumns: ['discordUsername', 'discordId', 'role', 'createdAt'] }, access: { read: isAdmin, create: isAdmin, update: isAdmin, delete: isAdmin }, hooks: { afterChange: [async ({ doc, previousDoc, req, operation }) => {
@@ -10,6 +11,10 @@ export const Users: CollectionConfig = { slug: 'users', labels: { singular: 'ユ
     if (previousDoc?.role === 'pending' && doc.role !== 'pending') {
       await notifyUserApproved({ discordUsername: doc.discordUsername, discordId: doc.discordId })
     }
+  }
+  // アカウント名が変わったら、そのユーザーが作成/依頼した記事の表示名もそろえる。
+  if (operation === 'update' && doc.discordUsername !== previousDoc?.discordUsername) {
+    await syncEventUserNames(req.payload, { discordId: doc.discordId, discordUsername: doc.discordUsername })
   }
   return doc
 }] }, fields: [
