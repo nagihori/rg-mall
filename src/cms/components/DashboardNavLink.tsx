@@ -18,8 +18,8 @@ export const DashboardNavLink: React.FC = () => {
     </>
   )
 
-  if (active) return <div className="nav__link" id="nav-dashboard">{label}</div>
-  return <Link className="nav__link" href={admin} id="nav-dashboard" prefetch={false}>{label}</Link>
+  if (active) return <div className="nav__link admin-nav-dashboard" id="nav-dashboard">{label}</div>
+  return <Link className="nav__link admin-nav-dashboard" href={admin} id="nav-dashboard" prefetch={false}>{label}</Link>
 }
 
 export default DashboardNavLink

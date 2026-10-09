@@ -513,3 +513,9 @@ body,
   cursor: pointer;
 }
 .admin-theme-toggle:hover { background: var(--theme-elevation-100); }
+
+/* サイドメニューのダッシュボード: コレクション/グローバルの項目と見分けがつくよう、太字にして前後に余白を取る。 */
+.admin-nav-dashboard {
+  margin: calc(var(--base) / 2) 0 var(--base);
+  font-weight: 700;
+}
