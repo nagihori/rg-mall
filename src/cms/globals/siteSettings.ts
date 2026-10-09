@@ -70,6 +70,7 @@ export const SiteSettings: GlobalConfig = {
               name: 'copyright', type: 'text', label: 'コピーライト', maxLength: 120, defaultValue: DEFAULT_COPYRIGHT,
               admin: { description: 'フッター画像の下の帯に表示します。空欄にすると既定の表記に戻ります' },
             },
+            { name: 'footerInfoHeading', type: 'ui', admin: { components: { Field: { path: './src/cms/components/SectionHeading.tsx', clientProps: { label: 'フッターの掲載情報' } } } } },
             { name: 'server', type: 'text', label: 'サーバー', maxLength: 60 },
             { name: 'location', type: 'text', label: '所在地', maxLength: 120 },
             { name: 'contactText', type: 'text', label: 'お問い合わせ', maxLength: 120 },
@@ -87,6 +88,7 @@ export const SiteSettings: GlobalConfig = {
                 },
               ],
             },
+            { name: 'footerRecruitingHeading', type: 'ui', admin: { components: { Field: { path: './src/cms/components/SectionHeading.tsx', clientProps: { label: 'メンバー募集' } } } } },
             { name: 'recruitingEnabled', type: 'checkbox', label: '追加メンバー募集を表示', defaultValue: false },
             {
               name: 'recruitingText', type: 'text', label: '募集文言', maxLength: 80,

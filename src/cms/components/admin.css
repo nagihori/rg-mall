@@ -485,3 +485,14 @@ body,
 /* パンくずのホームはPayload側で18px四方に固定されているため、ファビコン+商店街名が収まるよう解除する。 */
 .step-nav__home { width: auto !important; height: auto !important; }
 .admin-site-title--crumb svg, .admin-site-title__icon { flex: none; width: 18px; height: 18px; object-fit: contain; }
+
+/* 項目の多い編集画面の見出し帯(SectionHeading)。上に余白を取り、下線で前後のまとまりを分ける。 */
+.admin-section-heading {
+  margin: calc(var(--base) * 1.5) 0 var(--base);
+  padding: calc(var(--base) / 3) calc(var(--base) / 2);
+  border-left: 3px solid var(--theme-elevation-400);
+  background: var(--theme-elevation-50);
+  color: var(--theme-elevation-800);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
