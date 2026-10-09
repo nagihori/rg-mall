@@ -634,6 +634,18 @@ export interface VercelUsageMonitor {
 export interface SiteSetting {
   id: number;
   /**
+   * 公開サイトのタイトル（メタ情報の {{site_title}}）・フッター・管理画面のメニューとパンくずに表示されます
+   */
+  mallName: string;
+  /**
+   * ブラウザのタブや管理画面のパンくずに表示される正方形の画像（推奨: 512×512px以上）。未設定の場合、公開サイトは未設定のまま、管理画面はPayloadのアイコンを表示します
+   */
+  favicon?: (number | null) | Media;
+  /**
+   * オンの場合、Google等の検索エンジンがサイトを巡回し、検索結果に表示されることがあります。オフにすると、robots.txt と各ページのnoindex指定で巡回・検索結果への掲載を控えるよう求めます(公開直前の調整中などに便利です)。ただしこれは「お願い」であり、URLを知っている人がアクセスすることや、従わないクローラーまでは防げません。反映まで検索エンジン側で数日〜数週間かかることがあります。
+   */
+  allowSearchEngines?: boolean | null;
+  /**
    * 未設定の場合は既定の画像を使用します
    */
   headerImage?: (number | null) | Media;
@@ -646,7 +658,6 @@ export interface SiteSetting {
    * フッター画像の下の帯に表示します。空欄にすると既定の表記に戻ります
    */
   copyright?: string | null;
-  mallName: string;
   server?: string | null;
   location?: string | null;
   contactText?: string | null;
@@ -665,15 +676,15 @@ export interface SiteSetting {
    */
   recruitingUrl?: string | null;
   /**
-   * 使える変数: {{site_title}}(商店街名)
+   * 使える変数: {{site_title}}(商店街名 / 基本設定で変更)
    */
   homeTitleTemplate?: string | null;
   /**
-   * 使える変数: {{event_title}}(イベント名) / {{site_title}}(商店街名)
+   * 使える変数: {{event_title}}(イベント名) / {{site_title}}(商店街名 / 基本設定で変更)
    */
   eventTitleTemplate?: string | null;
   /**
-   * 使える変数: {{store_title}}(店舗名) / {{site_title}}(商店街名)
+   * 使える変数: {{store_title}}(店舗名) / {{site_title}}(商店街名 / 基本設定で変更)
    */
   storeTitleTemplate?: string | null;
   /**
@@ -684,14 +695,6 @@ export interface SiteSetting {
    * SNS等でトップページのリンクを共有した際に表示される画像。未設定の場合はヘッダー画像を使用します
    */
   ogImage?: (number | null) | Media;
-  /**
-   * ブラウザのタブや管理画面のパンくずに表示される正方形の画像（推奨: 512×512px以上）。未設定の場合、公開サイトは未設定のまま、管理画面はPayloadのアイコンを表示します
-   */
-  favicon?: (number | null) | Media;
-  /**
-   * オンの場合、Google等の検索エンジンがサイトを巡回し、検索結果に表示されることがあります。オフにすると、robots.txt と各ページのnoindex指定で巡回・検索結果への掲載を控えるよう求めます(公開直前の調整中などに便利です)。ただしこれは「お願い」であり、URLを知っている人がアクセスすることや、従わないクローラーまでは防げません。反映まで検索エンジン側で数日〜数週間かかることがあります。
-   */
-  allowSearchEngines?: boolean | null;
   /**
    * 商店街メンバー向けの内部イベント(公開サイトには表示されません)。詳細はDiscordで運用するため、ここでは管理画面カレンダーに出す日付とタイトルだけを登録します。
    */
@@ -725,11 +728,13 @@ export interface VercelUsageMonitorSelect<T extends boolean = true> {
  * via the `definition` "siteSettings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
+  mallName?: T;
+  favicon?: T;
+  allowSearchEngines?: T;
   headerImage?: T;
   tagline?: T;
   footerImage?: T;
   copyright?: T;
-  mallName?: T;
   server?: T;
   location?: T;
   contactText?: T;
@@ -743,8 +748,6 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   storeTitleTemplate?: T;
   siteDescription?: T;
   ogImage?: T;
-  favicon?: T;
-  allowSearchEngines?: T;
   fcEvents?:
     | T
     | {
