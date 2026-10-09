@@ -19,6 +19,19 @@ export function canTransition(from: EventStatus, to: EventStatus, role: 'editor'
 export function assertTransition(from: EventStatus, to: EventStatus, role: 'editor' | 'reviewer' | 'admin') {
   if (!canTransition(from, to, role)) throw new Error(`Invalid event transition: ${from} -> ${to}`)
 }
+// 本文などの内容を編集できるのは下書き(と、まだ保存前の新規作成)の間だけ。
+// 確認待ちは確認者が見ている最中に内容が変わらないよう、公開中・過去のイベントは公開内容を直接変えないよう固定する。
+export function isContentEditable(status: EventStatus | null | undefined) {
+  return !status || status === 'draft'
+}
+// 確認者/管理者が自分で出した確認依頼は、通知しても自分宛てになるだけなので Discord には流さない。
+export function shouldNotifyReviewRequest(role: 'editor' | 'reviewer' | 'admin' | 'pending' | undefined) {
+  return role !== 'reviewer' && role !== 'admin'
+}
+// 過去に一度でも公開した記事(下書きへ戻して再度公開した場合・過去のイベントから戻した場合)は再公開として扱い、公開通知は出さない。
+export function isRepublish(previous: { publishedAt?: string | null } | null | undefined) {
+  return Boolean(previous?.publishedAt)
+}
 export function isPublic(status: EventStatus) { return status === 'published' || status === 'archived' }
 export function classifyEvent(input: { status: EventStatus; startsAt?: string | null; endsAt?: string | null; publishedAt?: string | null }, now = new Date()): EventCategory | null {
   if (!isPublic(input.status)) return null

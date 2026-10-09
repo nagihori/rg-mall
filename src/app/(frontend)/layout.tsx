@@ -15,6 +15,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: { default: settings.mallName, template: `%s « ${settings.mallName}` },
     description: settings.siteDescription,
+    // 管理画面で登録した場合だけ上書きする(未登録ならNext.jsの既定のまま)
+    icons: settings.faviconUrl ? { icon: settings.faviconUrl } : undefined,
     // 検索エンジン許可がオフの間は全ページにnoindexを付ける(robots.txtと合わせた二重の意思表示)
     robots: settings.allowSearchEngines ? undefined : { index: false, follow: false },
   }

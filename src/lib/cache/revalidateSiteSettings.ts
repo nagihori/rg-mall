@@ -1,6 +1,6 @@
 import { revalidatePath } from 'next/cache'
 
-// フッターは全ページ共通(レイアウト側で商店街設定を取得)のため、layoutごとキャッシュを破棄する。
+// フッターは全ページ共通(レイアウト側でサイト設定を取得)のため、layoutごとキャッシュを破棄する。
 export function revalidatePublicSitePaths() {
   try {
     revalidatePath('/', 'layout')

@@ -1,8 +1,9 @@
 'use client'
 
 import type { SelectFieldClientProps } from 'payload'
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button, ConfirmationModal, useAuth, useDocumentInfo, useField, useForm, useModal } from '@payloadcms/ui'
+import { ProcessingOverlay } from './ProcessingOverlay'
 import { eventStatusLabels as statusLabels, type EventStatus } from '@/lib/domain/events'
 
 type Role = 'admin' | 'editor' | 'reviewer'
@@ -35,9 +36,9 @@ function actionsFor(status: EventStatus, role: Role): Action[] {
       ]
     case 'published':
       return [
-        // 表示中の内容は直接編集できない設計のため、「編集する」＝一旦下書きに戻す、という意味を持つ。
+        // 表示中の内容は直接編集できない設計のため、編集したいときは一旦下書きに戻す。
         // 押した瞬間サイトから見えなくなる（押し間違えると即非表示）ので、これだけ確認を挟む。
-        { key: 'draft', to: 'draft', label: '編集する', description: '下書きに戻して編集できるようにします（サイトからは見えなくなります）', confirmModalSlug: editConfirmModalSlug },
+        { key: 'draft', to: 'draft', label: '下書きに戻す', description: '下書きに戻して編集できるようにします（サイトからは見えなくなります）', confirmModalSlug: editConfirmModalSlug },
         { key: 'archived', to: 'archived', label: '過去のイベントに移動する', description: '終了したイベントとして扱います（サイトには引き続き表示されます）', style: 'secondary' },
       ]
     case 'archived':
@@ -60,7 +61,7 @@ function statusMessage(status: EventStatus, canReview: boolean): string | null {
 // 「なぜ消せないか」を編集画面側で先に案内しておく。
 function deleteNote(status: EventStatus): string | null {
   if (status === 'draft') return null
-  return '削除できるのは下書き状態のイベントのみです。削除したい場合は先に「編集する」等で下書きに戻してください'
+  return '削除できるのは下書き状態のイベントのみです。削除したい場合は先に「下書きに戻す」等で下書きに戻してください'
 }
 
 // イベント編集画面のワークフロー操作。プルダウンだと本来許されない遷移(下書き→公開など)も選べてしまい
@@ -75,6 +76,8 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
   const { setModified, submit } = useForm()
   const { id, collectionSlug } = useDocumentInfo()
   const { toggleModal } = useModal()
+  const [busy, setBusy] = useState(false)
+  const busyRef = useRef(false)
   const { user } = useAuth()
   const role = ((user as { role?: Role } | null)?.role ?? 'editor') as Role
   const currentStatus = (value ?? 'draft') as EventStatus
@@ -82,11 +85,6 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
   // 「保存する」は下書き中の内容保持のためだけの操作。確認待ち以降はステータス遷移ボタンが
   // 実質的に保存を兼ねるため、下書きのときだけ出す。
   const actions = currentStatus === 'draft' ? [saveAction(), ...transitions] : transitions
-  const isPublicNow = currentStatus === 'published' || currentStatus === 'archived'
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
-  // 公開中/過去のイベントは公開URLそのもの、下書き・確認待ちはステータスを無視して読めるプレビュー専用ルートを指す。
-  // まだ一度も保存していない(id未確定の)新規作成中はどちらも参照できないため出さない。
-  const previewUrl = !id ? null : isPublicNow && slug ? `${appUrl}/events/${slug}` : `${appUrl}/events/preview/${id}`
   const message = statusMessage(currentStatus, role === 'reviewer' || role === 'admin')
   const deleteMessage = deleteNote(currentStatus)
 
@@ -101,32 +99,57 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
   }, [currentStatus, setModified])
 
   const handleClick = async (to: EventStatus) => {
+    // 処理中の二重操作を防ぐ(stateの反映前に連打されても弾けるようrefでも持つ)。
+    if (busyRef.current) return
+    busyRef.current = true
+    setBusy(true)
     const previous = currentStatus
     setValue(to)
-    await submit({ overrides: { status: to } })
-    // submit() の戻り値は当てにならない（サーバーが拒否しても検知できない）ため、
-    // 保存後に実際のドキュメントを読み直してボタンの見た目を正しい状態に合わせ直す。
-    // このsetValueはあくまで表示の同期用で内容の変更ではないため、直後にmodifiedを
-    // 戻しておかないと「保存済みなのに保存されていません」警告が誤って出てしまう。
+    let reloading = false
     try {
-      const res = await fetch(`/api/${collectionSlug}/${id}?depth=0`, { credentials: 'include' })
-      const doc = res.ok ? await res.json() : null
-      setValue(doc?.status ?? previous)
-    } catch {
-      setValue(previous)
+      await submit({ overrides: { status: to } })
+      // submit() の戻り値は当てにならない（サーバーが拒否しても検知できない）ため、
+      // 保存後に実際のドキュメントを読み直して、遷移できたかどうかを確かめる。
+      let savedStatus: EventStatus | undefined
+      try {
+        const res = await fetch(`/api/${collectionSlug}/${id}?depth=0`, { credentials: 'include' })
+        savedStatus = res.ok ? (await res.json())?.status : undefined
+      } catch {
+        savedStatus = undefined
+      }
+      if (savedStatus === to && to !== previous) {
+        // Payloadは保存直後のフォーム状態を「遷移前のステータス」で計算した編集権限で組み立てるため、
+        // 公開→下書きでは本文が編集できないまま/確認待ち→公開では本文が編集できてしまうことがあった
+        // (router.refresh()では入れ替わらない)。一覧から開き直したときと同じ状態にするため、
+        // 遷移に成功したときは画面ごと読み込み直す。読み込みが終わるまでオーバーレイは出したままにする。
+        reloading = true
+        // 「保存されていない変更があります」の離脱確認が出ないよう、先にmodifiedを戻しておく。
+        setModified(false)
+        window.location.reload()
+        return
+      }
+      // 拒否された場合は表示だけ実際の状態に戻す。このsetValueは内容の変更ではないため、
+      // 直後にmodifiedを戻しておかないと「保存済みなのに保存されていません」警告が誤って出てしまう。
+      setValue(savedStatus ?? previous)
     } finally {
-      // setValueの内部処理が次のtickでmodifiedを再度立てることがあるため、1tick後にリセットする。
-      setTimeout(() => setModified(false), 0)
+      if (!reloading) {
+        busyRef.current = false
+        setBusy(false)
+        // setValueの内部処理が次のtickでmodifiedを再度立てることがあるため、1tick後にリセットする。
+        setTimeout(() => setModified(false), 0)
+      }
     }
   }
+  const disabled = busy
 
   return (
     <>
+      <ProcessingOverlay active={disabled} />
       <ConfirmationModal
         modalSlug={editConfirmModalSlug}
-        heading="編集しますか？"
-        body="下書きに戻します。この瞬間からサイトには表示されなくなります。よろしいですか？"
-        confirmLabel="編集する"
+        heading="下書きに戻しますか？"
+        body="下書きに戻して編集できるようにします。この瞬間からサイトには表示されなくなります。よろしいですか？"
+        confirmLabel="下書きに戻す"
         cancelLabel="キャンセル"
         onConfirm={() => handleClick('draft')}
       />
@@ -158,17 +181,13 @@ export const EventStatusActions: React.FC<SelectFieldClientProps> = ({ path }) =
             {requesterName && <div>確認依頼者: {requesterName}</div>}
           </div>
         )}
-        {previewUrl && (
-          <a className="event-status-actions__preview-link" href={previewUrl} target="_blank" rel="noreferrer">
-            {isPublicNow ? '公開ページを開く ↗' : 'プレビューを開く ↗'}
-          </a>
-        )}
       </div>
       <div className="event-status-actions__bar">
         {actions.map((action) => (
           <Button
             key={action.key}
             buttonStyle={action.style ?? 'primary'}
+            disabled={disabled}
             size="small"
             onClick={() => (action.confirmModalSlug ? toggleModal(action.confirmModalSlug) : handleClick(action.to))}
             tooltip={action.description}

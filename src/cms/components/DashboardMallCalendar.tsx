@@ -17,7 +17,7 @@ export default async function DashboardMallCalendar({ user }: { user?: AdminView
         <h2>商店街カレンダー</h2>
         <Link className="admin-mall-calendar-edit-link" href="/admin/globals/siteSettings">FCイベント登録・更新へ</Link>
       </div>
-      <p className="admin-mall-calendar-view-lead">FC内部イベントの詳細はDiscordで運用しています。日付とタイトルのみ「商店街設定」の「FCイベント」タブから登録します。</p>
+      <p className="admin-mall-calendar-view-lead">FC内部イベントの詳細はDiscordで運用しています。日付とタイトルのみ「サイト設定」の「FCイベント」タブから登録します。</p>
       <AdminMallCalendar months={months} entries={entries} />
     </section>
   )
