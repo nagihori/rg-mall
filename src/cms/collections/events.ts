@@ -36,6 +36,8 @@ export const Events: CollectionConfig = {
     }],
     beforeChange: [({ data, originalDoc, operation, req }) => {
       const next = data ?? {}
+      // ユーザー名変更に伴う表示名の一括更新(syncEventUserNames)は状態遷移・検証の対象外。
+      if (req.context?.skipEventWorkflow) return next
       // フィールド追加前に作られた記事はcreatedByDiscordId/Usernameが無いため、未設定ならそのつど今の編集者情報で埋める。
       if (!next.createdByDiscordId && !originalDoc?.createdByDiscordId) next.createdByDiscordId = req.user?.discordId
       if (!next.createdByUsername && !originalDoc?.createdByUsername) next.createdByUsername = req.user?.discordUsername
