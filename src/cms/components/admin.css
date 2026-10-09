@@ -481,3 +481,35 @@ body,
 .admin-env-badge--production { background: #c0392b; }
 .admin-env-badge--staging { background: #d68910; }
 .admin-env-badge--development { background: #2e86c1; }
+
+/* パンくずのホームはPayload側で18px四方に固定されているため、ファビコン+商店街名が収まるよう解除する。 */
+.step-nav__home { width: auto !important; height: auto !important; }
+.admin-site-title--crumb svg, .admin-site-title__icon { flex: none; width: 18px; height: 18px; object-fit: contain; }
+
+/* 項目の多い編集画面の見出し帯(SectionHeading)。入力欄(背景色つき)と見分けがつくよう、
+   背景は付けずに文字色と同じ色の下線だけで前後のまとまりを分ける(ライトでは黒・ダークでは白)。 */
+.admin-section-heading {
+  margin: calc(var(--base) * 1.5) 0 var(--base);
+  padding-bottom: calc(var(--base) / 4);
+  border-bottom: 2px solid var(--theme-text);
+  color: var(--theme-text);
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+/* ヘッダー右上のライト/ダーク切り替え。枠なしの小さなアイコンボタン。 */
+.admin-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-right: calc(var(--base) / 4);
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--theme-elevation-800);
+  cursor: pointer;
+}
+.admin-theme-toggle:hover { background: var(--theme-elevation-100); }

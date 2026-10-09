@@ -13,7 +13,7 @@ import {
 // 読み取りは常に許可し、更新は他の記事コレクションと同じくcanEdit(editor以上)に揃える。
 export const SiteSettings: GlobalConfig = {
   slug: 'siteSettings',
-  label: '商店街設定',
+  label: 'サイト設定',
   admin: { components: { elements: { beforeDocumentControls: ['./src/cms/components/ProcessingOverlay.tsx'] } } },
   access: { read: () => true, update: canEdit },
   hooks: {
@@ -32,6 +32,29 @@ export const SiteSettings: GlobalConfig = {
       type: 'tabs',
       tabs: [
         {
+          label: '基本設定',
+          description: 'サイト全体に関わる設定です。ヘッダー・フッターの画像や、title・OGP画像などのメタ情報は各タブで変更できます。',
+          fields: [
+            {
+              name: 'mallName', type: 'text', label: '商店街名', required: true, maxLength: 60,
+              admin: { description: '公開サイトのタイトル（メタ情報の {{site_title}}）・フッター・管理画面のメニューとパンくずに表示されます' },
+            },
+            {
+              name: 'favicon', type: 'relationship', relationTo: 'media', label: 'ファビコン',
+              admin: { description: 'ブラウザのタブや管理画面のパンくずに表示される正方形の画像（推奨: 512×512px以上）。未設定の場合、公開サイトは未設定のまま、管理画面はPayloadのアイコンを表示します' },
+            },
+            {
+              name: 'allowSearchEngines', type: 'checkbox', label: '検索エンジンにサイトの情報取得(クロール)を許可する', defaultValue: true,
+              admin: {
+                description: 'オンの場合、Google等の検索エンジンがサイトを巡回し、検索結果に表示されることがあります。'
+                  + 'オフにすると、robots.txt と各ページのnoindex指定で巡回・検索結果への掲載を控えるよう求めます(公開直前の調整中などに便利です)。'
+                  + 'ただしこれは「お願い」であり、URLを知っている人がアクセスすることや、従わないクローラーまでは防げません。'
+                  + '反映まで検索エンジン側で数日〜数週間かかることがあります。',
+              },
+            },
+          ],
+        },
+        {
           label: 'ヘッダー',
           fields: [
             { name: 'headerImage', type: 'relationship', relationTo: 'media', label: 'ヘッダー画像(ロゴ)', admin: { description: '未設定の場合は既定の画像を使用します' } },
@@ -40,13 +63,14 @@ export const SiteSettings: GlobalConfig = {
         },
         {
           label: 'フッター',
+          description: 'フッターに表示される商店街名は「基本設定」で変更できます。',
           fields: [
             { name: 'footerImage', type: 'relationship', relationTo: 'media', label: 'フッター背景画像', admin: { description: '未設定の場合は既定の画像を使用します' } },
             {
               name: 'copyright', type: 'text', label: 'コピーライト', maxLength: 120, defaultValue: DEFAULT_COPYRIGHT,
               admin: { description: 'フッター画像の下の帯に表示します。空欄にすると既定の表記に戻ります' },
             },
-            { name: 'mallName', type: 'text', label: '商店街名', required: true, maxLength: 60 },
+            { name: 'footerInfoHeading', type: 'ui', admin: { components: { Field: { path: './src/cms/components/SectionHeading.tsx', clientProps: { label: 'フッターの掲載情報' } } } } },
             { name: 'server', type: 'text', label: 'サーバー', maxLength: 60 },
             { name: 'location', type: 'text', label: '所在地', maxLength: 120 },
             { name: 'contactText', type: 'text', label: 'お問い合わせ', maxLength: 120 },
@@ -64,6 +88,7 @@ export const SiteSettings: GlobalConfig = {
                 },
               ],
             },
+            { name: 'footerRecruitingHeading', type: 'ui', admin: { components: { Field: { path: './src/cms/components/SectionHeading.tsx', clientProps: { label: 'メンバー募集' } } } } },
             { name: 'recruitingEnabled', type: 'checkbox', label: '追加メンバー募集を表示', defaultValue: false },
             {
               name: 'recruitingText', type: 'text', label: '募集文言', maxLength: 80,
@@ -85,21 +110,22 @@ export const SiteSettings: GlobalConfig = {
         },
         {
           label: 'メタ情報',
+          description: '{{site_title}} には「基本設定」＞「商店街名」の値が入ります。ファビコンと検索エンジンのクロール許可も「基本設定」にあります。',
           fields: [
             {
               name: 'homeTitleTemplate', type: 'text', label: 'title(トップページ)', maxLength: 120,
               defaultValue: DEFAULT_HOME_TITLE_TEMPLATE,
-              admin: { description: '使える変数: {{site_title}}(商店街名)' },
+              admin: { description: '使える変数: {{site_title}}(商店街名 / 基本設定で変更)' },
             },
             {
               name: 'eventTitleTemplate', type: 'text', label: 'title(イベント詳細)', maxLength: 120,
               defaultValue: DEFAULT_EVENT_TITLE_TEMPLATE,
-              admin: { description: '使える変数: {{event_title}}(イベント名) / {{site_title}}(商店街名)' },
+              admin: { description: '使える変数: {{event_title}}(イベント名) / {{site_title}}(商店街名 / 基本設定で変更)' },
             },
             {
               name: 'storeTitleTemplate', type: 'text', label: 'title(店舗詳細)', maxLength: 120,
               defaultValue: DEFAULT_STORE_TITLE_TEMPLATE,
-              admin: { description: '使える変数: {{store_title}}(店舗名) / {{site_title}}(商店街名)' },
+              admin: { description: '使える変数: {{store_title}}(店舗名) / {{site_title}}(商店街名 / 基本設定で変更)' },
             },
             {
               name: 'siteDescription', type: 'textarea', label: 'description(トップページ)', maxLength: 200,
@@ -108,15 +134,6 @@ export const SiteSettings: GlobalConfig = {
             {
               name: 'ogImage', type: 'relationship', relationTo: 'media', label: 'OGP画像(トップページ)',
               admin: { description: 'SNS等でトップページのリンクを共有した際に表示される画像。未設定の場合はヘッダー画像を使用します' },
-            },
-            {
-              name: 'allowSearchEngines', type: 'checkbox', label: '検索エンジンにサイトの情報取得(クロール)を許可する', defaultValue: true,
-              admin: {
-                description: 'オンの場合、Google等の検索エンジンがサイトを巡回し、検索結果に表示されることがあります。'
-                  + 'オフにすると、robots.txt と各ページのnoindex指定で巡回・検索結果への掲載を控えるよう求めます(公開直前の調整中などに便利です)。'
-                  + 'ただしこれは「お願い」であり、URLを知っている人がアクセスすることや、従わないクローラーまでは防げません。'
-                  + '反映まで検索エンジン側で数日〜数週間かかることがあります。',
-              },
             },
           ],
         },

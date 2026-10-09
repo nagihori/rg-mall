@@ -33,6 +33,7 @@ export type SiteSettingsViewModel = {
   ogImageUrl: string | null
   ogImageWidth: number | null
   ogImageHeight: number | null
+  faviconUrl: string | null
   allowSearchEngines: boolean
 }
 
@@ -73,6 +74,7 @@ export const getSiteSettings = cache(async (): Promise<SiteSettingsViewModel> =>
     ogImageUrl: toImageUrl(doc.ogImage) ?? toImageUrl(doc.headerImage),
     ogImageWidth: toImageDim(doc.ogImage, 'width') ?? toImageDim(doc.headerImage, 'width'),
     ogImageHeight: toImageDim(doc.ogImage, 'height') ?? toImageDim(doc.headerImage, 'height'),
+    faviconUrl: toImageUrl(doc.favicon),
     allowSearchEngines: doc.allowSearchEngines ?? true,
   }
 })

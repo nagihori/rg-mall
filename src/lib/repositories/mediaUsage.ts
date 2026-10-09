@@ -19,7 +19,7 @@ export async function findMediaUsages(payload: Payload, mediaId: number | string
   ])
   for (const doc of events.docs) usages.push(`イベント「${doc.title}」`)
   for (const doc of stores.docs) usages.push(`所属店舗「${doc.name}」`)
-  const used = [settings.headerImage, settings.footerImage, settings.ogImage].map((value) => (typeof value === 'object' && value ? value.id : value))
-  if (used.some((id) => String(id) === String(mediaId))) usages.push('サイト設定(ヘッダー/フッター/OGP画像)')
+  const used = [settings.headerImage, settings.footerImage, settings.ogImage, settings.favicon].map((value) => (typeof value === 'object' && value ? value.id : value))
+  if (used.some((id) => String(id) === String(mediaId))) usages.push('サイト設定(ヘッダー/フッター/OGP画像/ファビコン)')
   return usages
 }
