@@ -486,13 +486,30 @@ body,
 .step-nav__home { width: auto !important; height: auto !important; }
 .admin-site-title--crumb svg, .admin-site-title__icon { flex: none; width: 18px; height: 18px; object-fit: contain; }
 
-/* 項目の多い編集画面の見出し帯(SectionHeading)。上に余白を取り、下線で前後のまとまりを分ける。 */
+/* 項目の多い編集画面の見出し帯(SectionHeading)。入力欄(背景色つき)と見分けがつくよう、
+   背景は付けずに文字色と同じ色の下線だけで前後のまとまりを分ける(ライトでは黒・ダークでは白)。 */
 .admin-section-heading {
   margin: calc(var(--base) * 1.5) 0 var(--base);
-  padding: calc(var(--base) / 3) calc(var(--base) / 2);
-  border-left: 3px solid var(--theme-elevation-400);
-  background: var(--theme-elevation-50);
-  color: var(--theme-elevation-800);
-  font-size: 0.875rem;
-  font-weight: 600;
+  padding-bottom: calc(var(--base) / 4);
+  border-bottom: 2px solid var(--theme-text);
+  color: var(--theme-text);
+  font-size: 0.9375rem;
+  font-weight: 700;
 }
+
+/* ヘッダー右上のライト/ダーク切り替え。枠なしの小さなアイコンボタン。 */
+.admin-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-right: calc(var(--base) / 4);
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--theme-elevation-800);
+  cursor: pointer;
+}
+.admin-theme-toggle:hover { background: var(--theme-elevation-100); }

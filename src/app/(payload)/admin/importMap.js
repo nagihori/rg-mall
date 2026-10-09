@@ -34,6 +34,7 @@ import { default as default_aa9f988258e125f413a00eeb05e80207 } from '../../../..
 import { default as default_d1906b3d7cb0161c0f5e9ab7f874f7b8 } from '../../../../src/cms/components/AutoResizeUploadControl.tsx'
 import { default as default_0b6b962a21b52f8d07085f97f167f884 } from '../../../../src/cms/components/SectionHeading.tsx'
 import { SiteTitleIcon as SiteTitleIcon_71eafbad03c84fff2b3510cf2d6d224f } from '../../../../src/cms/components/SiteTitle.tsx'
+import { default as default_d0a90de3f81c3f36b037be0e9ce20b82 } from '../../../../src/cms/components/ThemeToggle.tsx'
 import { default as default_799bd01eb3137dfbcaed9e1f7071209c } from '../../../../src/cms/components/PublicSiteLink.tsx'
 import { default as default_5786b744cd2ac83915a8bde47006d746 } from '../../../../src/cms/components/LogoutLink.tsx'
 import { default as default_9bc91f63bd53f753072b3a83c55460be } from '../../../../src/cms/components/DashboardMallCalendar.tsx'
@@ -82,6 +83,7 @@ export const importMap = {
   "./src/cms/components/AutoResizeUploadControl.tsx#default": default_d1906b3d7cb0161c0f5e9ab7f874f7b8,
   "./src/cms/components/SectionHeading.tsx#default": default_0b6b962a21b52f8d07085f97f167f884,
   "./src/cms/components/SiteTitle.tsx#SiteTitleIcon": SiteTitleIcon_71eafbad03c84fff2b3510cf2d6d224f,
+  "./src/cms/components/ThemeToggle.tsx#default": default_d0a90de3f81c3f36b037be0e9ce20b82,
   "./src/cms/components/PublicSiteLink.tsx#default": default_799bd01eb3137dfbcaed9e1f7071209c,
   "./src/cms/components/LogoutLink.tsx#default": default_5786b744cd2ac83915a8bde47006d746,
   "./src/cms/components/DashboardMallCalendar.tsx#default": default_9bc91f63bd53f753072b3a83c55460be,
