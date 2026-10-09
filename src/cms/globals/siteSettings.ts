@@ -13,7 +13,7 @@ import {
 // 読み取りは常に許可し、更新は他の記事コレクションと同じくcanEdit(editor以上)に揃える。
 export const SiteSettings: GlobalConfig = {
   slug: 'siteSettings',
-  label: '商店街設定',
+  label: 'サイト設定',
   admin: { components: { elements: { beforeDocumentControls: ['./src/cms/components/ProcessingOverlay.tsx'] } } },
   access: { read: () => true, update: canEdit },
   hooks: {
