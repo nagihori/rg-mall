@@ -63,14 +63,8 @@ export async function GET(request: NextRequest) {
       userId: user.id,
       adminDiscordIds: admins.docs.map((admin) => admin.discordId),
     })
-  } else if (user.discordUsername !== discordUser.username) {
-    user = await payload.update({
-      collection: 'users',
-      id: user.id,
-      data: { discordUsername: discordUser.username },
-      overrideAccess: true,
-    })
   }
+  // 既存ユーザーのアカウント名(discordUsername)はDiscord側の名前で上書きしない。管理者が管理画面で変更した名前を保つため。
 
   if (user.role === 'pending') {
     const url = new URL('/login/pending', request.nextUrl.origin)
